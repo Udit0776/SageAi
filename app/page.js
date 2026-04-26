@@ -1,6 +1,6 @@
 "use client";
 
-import HeroSection from "@/components/hero";
+import HeroSection from "@/app/components/hero";
 import { features } from "@/data/feature";
 import { howItWorks } from "@/data/howItWorks";
 import {
@@ -9,10 +9,10 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@/app/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/app/components/ui/button";
 import { testimonial } from "@/data/testimonial";
 import { faqs } from "@/data/faqs";
 import {
@@ -20,7 +20,7 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
+} from "@/app/components/ui/accordion";
 import { ArrowRight } from "lucide-react";
 
 export default function Home() {

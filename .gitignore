@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Project Tracking
+progress_report.md
+project_overview.md
+
+/lib/generated/prisma

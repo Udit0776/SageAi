@@ -4,14 +4,15 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "./ui/button";
 import { FileText, GraduationCap, LayoutDashboard, PenBox, ChevronDown } from "lucide-react";
-import { 
-    DropdownMenu, 
-    DropdownMenuContent, 
-    DropdownMenuGroup, 
-    DropdownMenuItem, 
-    DropdownMenuLabel, 
-    DropdownMenuTrigger 
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuTrigger
 } from "./ui/dropdown-menu";
+import { checkUser } from "@/lib/checkUser";
 
 // In Clerk v7, SignedIn/SignedOut are moved or changed, so we use this stable pattern
 const SignedIn = ({ userId, children }) => userId ? <>{children}</> : null;
@@ -19,7 +20,9 @@ const SignedOut = ({ userId, children }) => !userId ? <>{children}</> : null;
 
 export default async function Header() {
     const { userId } = await auth();
-
+    if (userId) {
+        await checkUser();
+    }
     return (
         <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
             <div className="flex h-20 items-center justify-between px-8 w-full max-w-[1920px] mx-auto">

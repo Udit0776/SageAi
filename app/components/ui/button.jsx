@@ -1,3 +1,5 @@
+"use client"
+
 import * as React from "react"
 import { cva } from "class-variance-authority";
 import { Slot } from "radix-ui"
@@ -41,14 +43,14 @@ const buttonVariants = cva(
   }
 )
 
-function Button({
+const Button = React.forwardRef(({
   className,
   variant = "default",
   size = "default",
   asChild = false,
   ...props
-}) {
-  const Comp = asChild ? Slot.Root : "button"
+}, ref) => {
+  const Comp = asChild ? Slot : "button"
 
   return (
     <Comp
@@ -56,8 +58,10 @@ function Button({
       data-variant={variant}
       data-size={size}
       className={cn(buttonVariants({ variant, size, className }))}
+      ref={ref}
       {...props} />
   );
-}
+})
+Button.displayName = "Button"
 
 export { Button, buttonVariants }

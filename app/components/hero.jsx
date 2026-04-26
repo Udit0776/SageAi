@@ -3,7 +3,7 @@
 import React, { useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/app/components/ui/button";
 import { Sparkles } from "lucide-react";
 
 const HeroSection = () => {
@@ -15,7 +15,7 @@ const HeroSection = () => {
         const handleScroll = () => {
             const scrollPosition = window.scrollY;
             const scrollThreshold = 500;
-            
+
             if (scrollPosition <= scrollThreshold) {
                 // Smoothly interpolate from 20deg to 0deg
                 const rotation = 20 - (scrollPosition / scrollThreshold) * 20;

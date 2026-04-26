@@ -1,5 +1,16 @@
-import React from "react";
+"use client";
+
+import React, { useEffect } from "react";
 
 export default function AuthLayout({ children }) {
-  return <div className="flex justify-center pt-4 pb-12">{children}</div>;
+  useEffect(() => {
+    // Force scroll to top when the auth page loads
+    window.scrollTo(0, 0);
+  }, []);
+
+  return (
+    <div className="flex justify-center items-center min-h-[calc(100vh-80px)]">
+      {children}
+    </div>
+  );
 }

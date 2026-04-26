@@ -2,8 +2,9 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
-import { ThemeProvider } from "@/components/theme-provider";
-import Header from "@/components/header";
+import { ThemeProvider } from "@/app/components/theme-provider";
+import Header from "@/app/components/header";
+import { Toaster } from "sonner";
 
 // const inter = ComicSansMS({ subsets: ["latin"] });
 const inter = Inter({ subsets: ["latin"] });
@@ -30,6 +31,8 @@ export default function RootLayout({ children }) {
           >
             <Header />
             <main className="min-h-screen">{children}</main>
+            <Toaster richColors />
+
             {/* Footer */}
             <footer className="bg-muted/50 py-4">
               <div className="container mx-auto px-4 text-center text-gray-200">
