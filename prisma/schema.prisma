@@ -50,6 +50,8 @@ model Resume {
   userId    String   @unique
   user      User     @relation(fields: [userId], references: [id])
   content   String   @db.Text
+  atsScore  Float?
+  feedback  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -62,6 +64,7 @@ model CoverLetter {
   jobDescription String?
   companyName    String
   jobTitle       String
+  status         String   @default("draft")
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
@@ -83,12 +86,12 @@ model IndustryInsight {
   demandLevel DemandLevel
   topSkills   String[]
 
-  // market conditions'
-  mareketOutlook MarketOutlook
-  keyTrends      String[]
+  // market conditions
+  marketOutlook MarketOutlook
+  keyTrends     String[]
 
-  // learning suggestion 
-  recommendationSkills String[]
+  // learning suggestions
+  recommendedSkills String[]
 
   lastUpdated DateTime @default(now())
   nextUpdate  DateTime

@@ -1,5 +1,5 @@
 import React from "react";
-import OnboardingForm from "./component/onboarding-form";
+import OnboardingForm from "./_components/onboarding-form";
 import { getUserOnboardingStatus } from "@/action/user";
 import { redirect } from "next/navigation";
 import { industries } from "@/data/industries";

@@ -50,12 +50,10 @@ export default async function Header() {
                             </Link>
 
                             <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" className="flex items-center gap-2 font-semibold text-sm">
-                                        <PenBox className="h-4 w-4" />
-                                        <span>AI Tools</span>
-                                        <ChevronDown className="h-4 w-4 opacity-50" />
-                                    </Button>
+                                <DropdownMenuTrigger className="flex items-center gap-2 font-semibold text-sm hover:bg-muted px-3 py-2 rounded-lg transition-colors">
+                                    <PenBox className="h-4 w-4" />
+                                    <span>AI Tools</span>
+                                    <ChevronDown className="h-4 w-4 opacity-50" />
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end" className="w-56">
                                     <DropdownMenuLabel>Build Your Career</DropdownMenuLabel>
@@ -85,17 +83,13 @@ export default async function Header() {
                     </SignedIn>
 
                     <SignedOut userId={userId}>
-                        <SignInButton fallbackRedirectUrl="/dashboard">
-                            <Button className="rounded-full bg-black text-white border border-white/20 hover:bg-zinc-900 shadow-md font-medium text-xs px-5 py-1.5 transition-all active:scale-95">
-                                Sign In
-                            </Button>
-                        </SignInButton>
+                        <SignInButton fallbackRedirectUrl="/dashboard"><button className="rounded-full bg-black text-white border border-white/20 hover:bg-zinc-900 shadow-md font-medium text-xs px-5 py-1.5 transition-all active:scale-95">Sign In</button></SignInButton>
                     </SignedOut>
 
                     <SignedIn userId={userId}>
                         <div className="flex items-center gap-4">
                             <Link href="/dashboard" className="md:hidden">
-                                <Button variant="ghost" size="icon">
+                                <Button variant="ghost" size="icon" suppressHydrationWarning>
                                     <LayoutDashboard className="h-5 w-5" />
                                 </Button>
                             </Link>

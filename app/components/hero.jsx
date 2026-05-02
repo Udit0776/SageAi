@@ -47,11 +47,11 @@ const HeroSection = () => {
                     </p>
                 </div>
 
-                <div className="flex justify-center gap-4 relative z-20">
+                <div className="flex flex-col sm:flex-row justify-center gap-4 relative z-20 px-4">
                     <Button
                         asChild
                         size="lg"
-                        className="h-12 px-8 text-lg rounded-full font-semibold shadow-xl shadow-primary/20 hover:shadow-primary/30 transition-all hover:scale-105 active:scale-95"
+                        className="h-10 px-6 text-base sm:h-12 sm:px-8 sm:text-lg rounded-full font-semibold shadow-xl shadow-primary/20 hover:shadow-primary/30 transition-all hover:scale-105 active:scale-95 w-full sm:w-auto"
                     >
                         <Link href="/dashboard">Get Started</Link>
                     </Button>
@@ -59,7 +59,7 @@ const HeroSection = () => {
                         asChild
                         size="lg"
                         variant="outline"
-                        className="h-12 px-8 text-lg rounded-full font-semibold border-2 transition-all hover:bg-muted active:scale-95"
+                        className="h-10 px-6 text-base sm:h-12 sm:px-8 sm:text-lg rounded-full font-semibold border-2 transition-all hover:bg-muted active:scale-95 w-full sm:w-auto"
                     >
                         <Link href="/#how-it-works">Learn More</Link>
                     </Button>

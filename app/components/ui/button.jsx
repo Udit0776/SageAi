@@ -50,7 +50,7 @@ const Button = React.forwardRef(({
   asChild = false,
   ...props
 }, ref) => {
-  const Comp = asChild ? Slot : "button"
+  const Comp = asChild ? Slot.Root : "button"
 
   return (
     <Comp
@@ -59,6 +59,7 @@ const Button = React.forwardRef(({
       data-size={size}
       className={cn(buttonVariants({ variant, size, className }))}
       ref={ref}
+      suppressHydrationWarning
       {...props} />
   );
 })

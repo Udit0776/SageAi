@@ -39,11 +39,12 @@ export default function OnboardingForm({ industries }) {
 
     useEffect(() => {
         if (updateResult?.success && !updateLoading) {
-            toast.success("Profile updated successfully!")
-            router.push("/dashboard")
-            router.refresh();
+            toast.success("Profile updated successfully!");
+            router.push("/dashboard");
+        } else if (updateResult?.success === false) {
+            toast.error(updateResult.error || "Failed to update profile");
         }
-    }, [updateResult, updateLoading, router])
+    }, [updateResult, updateLoading, router]);
 
     const watchIndustry = watch("industry");
 

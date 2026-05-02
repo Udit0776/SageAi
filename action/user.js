@@ -1,67 +1,51 @@
 "use server";
+
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
-import { DemandLevel, MarketOutlook } from "@prisma/client";
-import { success } from "zod";
 
 export async function updateUser(data) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
   const user = await db.user.findUnique({
-    where: {
-      clerkUserId: userId,
-    },
+    where: { clerkUserId: userId },
   });
 
   if (!user) throw new Error("User not found");
 
   try {
-    const result = await db.user.$transaction(
-      async (tx) => {
-        let industryInsights = await tx.industryInsights.findUnique({
-          where: {
-            industry: data.industry,
-          },
-        });
-        if (!industryInsights) {
-          industryInsights = await tx.industryInsights.create({
-            data: {
-              industry: data.industry,
-              salaryRanges: [],
-              growthRate: 0,
-              demandLevel: "MEDIUM",
-              topSkills: [],
-              marketOutlook: "NEUTRAL",
-              keyTrends: [],
-              recommendedSkills: [],
-              nextUpdate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-            },
-          });
-        }
+    // Ensure industry insight record exists (with defaults — AI fills it on dashboard visit)
+    await db.industryInsight.upsert({
+      where: { industry: data.industry },
+      update: {}, // do nothing if it already exists
+      create: {
+        industry: data.industry,
+        salaryRanges: [],
+        growthRate: 0,
+        demandLevel: "MEDIUM",
+        topSkills: [],
+        marketOutlook: "NEUTRAL",
+        keyTrends: [],
+        recommendedSkills: [],
+        nextUpdate: new Date(), // triggers AI generation on first dashboard visit
+      },
+    });
 
-        // update user data
-        const updatedUser = await tx.user.update({
-          where: {
-            id: user.id,
-          },
-          data: {
-            industry: data.industry,
-            experience: data.experience,
-            bio: data.bio,
-            skills: data.skills,
-          },
-        });
-        return { updateUser, industryInsights };
+    // Update user profile (fast — no AI call)
+    const updatedUser = await db.user.update({
+      where: { id: user.id },
+      data: {
+        industry: data.industry,
+        experience: data.experience,
+        bio: data.bio,
+        skills: data.skills,
       },
-      {
-        timeout: 10000,
-      },
-    );
-    return { success: true, ...result };
+    });
+
+    return { success: true, updatedUser };
   } catch (error) {
-    console.log("Error updating user and industry", error.message);
-    throw new Error("Failed to update user");
+    console.error("Error updating user:", error);
+    return { success: false, error: error.message };
   }
 }
 

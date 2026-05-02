@@ -218,10 +218,10 @@ export default function Home() {
                   careers with Sage AI. Sign up today and take the first step
                   towards achieving your goals.
                 </p>
-                <Link href="/sign-up">
+                <Link href="/sign-up" className="w-full sm:w-auto">
                   <Button
                     size="lg"
-                    className="h-12 px-8 text-base font-semibold animate-bounce"
+                    className="h-10 px-6 text-sm sm:h-12 sm:px-8 sm:text-base font-semibold animate-bounce rounded-full w-full sm:w-auto"
                   >
                     Start Your Journey Today{" "}
                     <ArrowRight className="ml-2 h-4 w-4" />
