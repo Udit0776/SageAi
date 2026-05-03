@@ -50,7 +50,7 @@ export default async function Header() {
                             </Link>
 
                             <DropdownMenu>
-                                <DropdownMenuTrigger className="flex items-center gap-2 font-semibold text-sm hover:bg-muted px-3 py-2 rounded-lg transition-colors">
+                                <DropdownMenuTrigger className="flex items-center gap-2 font-semibold text-sm hover:bg-muted px-3 py-2 rounded-lg transition-colors" suppressHydrationWarning>
                                     <PenBox className="h-4 w-4" />
                                     <span>AI Tools</span>
                                     <ChevronDown className="h-4 w-4 opacity-50" />

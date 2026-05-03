@@ -84,19 +84,19 @@
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
+  --background: oklch(0 0 0);
   --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
+  --card: oklch(0 0 0);
   --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
+  --popover: oklch(0 0 0);
   --popover-foreground: oklch(0.985 0 0);
   --primary: oklch(0.922 0 0);
   --primary-foreground: oklch(0.205 0 0);
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
+  --muted: oklch(0 0 0);
   --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
+  --accent: oklch(0 0 0);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
@@ -179,4 +179,36 @@
 .hero-image {
   transform: rotateX(15deg) scale(1);
   will-change: transform;
+}
+
+/* Markdown Editor Font Sizes */
+.wmde-markdown {
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+  font-family: inherit !important;
+}
+
+.wmde-markdown h1 {
+  font-size: 1.5em !important;
+  margin-bottom: 0.4em !important;
+  border-bottom: 1px solid var(--border) !important;
+  padding-bottom: 0.2em !important;
+}
+
+.wmde-markdown h2 {
+  font-size: 1.25em !important;
+  margin-top: 1.2em !important;
+  margin-bottom: 0.4em !important;
+  border-bottom: 1px solid var(--border) !important;
+  padding-bottom: 0.1em !important;
+}
+
+.wmde-markdown h3 {
+  font-size: 1.05em !important;
+  margin-top: 1em !important;
+  margin-bottom: 0.3em !important;
+}
+
+.wmde-markdown p, .wmde-markdown li {
+  margin-bottom: 0.4em !important;
 }

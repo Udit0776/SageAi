@@ -12,6 +12,9 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata = {
   title: "SageAi - Guide Your Life",
   description: "Your AI-powered personal assistant",
+  icons: {
+    icon: "/logo.png",
+  },
 };
 
 export default function RootLayout({ children }) {

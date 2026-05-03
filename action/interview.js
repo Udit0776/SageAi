@@ -1,0 +1,157 @@
+"use server";
+
+import { db } from "@/lib/prisma";
+import { auth } from "@clerk/nextjs/server";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+const modelNames = [
+  "gemini-2.5-flash",
+  "gemini-2.5-flash-lite",
+  "gemini-2.0-flash",
+];
+
+async function getAIResponse(prompt) {
+  for (const modelName of modelNames) {
+    try {
+      const model = genAI.getGenerativeModel({ model: modelName });
+      const result = await model.generateContent(prompt);
+      return result.response.text();
+    } catch (error) {
+      console.warn(`Model ${modelName} failed, trying next...`, error.message);
+      continue;
+    }
+  }
+  throw new Error("All AI models failed to respond.");
+}
+
+export async function generateQuiz() {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+
+  const user = await db.user.findUnique({
+    where: { clerkUserId: userId },
+  });
+
+  if (!user) throw new Error("User Not Found");
+
+  const prompt = `
+    Generate 10 technical interview questions for a ${
+      user.industry
+    } professional${
+      user.skills?.length ? ` with expertise in ${user.skills.join(", ")}` : ""
+    }.
+    
+    Each question should be multiple choice with 4 options.
+    
+    Return the response in this JSON format only, no additional text:
+    {
+      "questions": [
+        {
+          "question": "string",
+          "options": ["string", "string", "string", "string"],
+          "correctAnswer": "string",
+          "explanation": "string"
+        }
+      ]
+    }
+  `;
+
+  try {
+    const text = await getAIResponse(prompt);
+    const cleanedText = text.replace(/```(?:json)?\n?/g, "").trim();
+    const quiz = JSON.parse(cleanedText);
+
+    return quiz.questions;
+  } catch (error) {
+    console.error("Error generating quiz:", error);
+    throw new Error("Failed to generate quiz. Please try again later.");
+  }
+}
+
+export async function saveQuizResult(questions, answers, score) {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+
+  const user = await db.user.findUnique({
+    where: { clerkUserId: userId },
+  });
+
+  if (!user) throw new Error("User Not Found");
+
+  const questionResults = questions.map((q, index) => ({
+    question: q.question,
+    answer: q.correctAnswer,
+    userAnswer: answers[index],
+    isCorrect: q.correctAnswer === answers[index],
+    explanation: q.explanation,
+  }));
+
+  const wrongAnswers = questionResults.filter((q) => !q.isCorrect);
+  let improvementTip = null;
+
+  if (wrongAnswers.length > 0) {
+    const wrongQuestionsText = wrongAnswers
+      .map(
+        (q) =>
+          `Question: "${q.question}"\nCorrect Answer: "${q.answer}"\nYour Answer: "${q.userAnswer}"`,
+      )
+      .join("\n\n");
+
+    const improvementPrompt = `
+      The user got the following ${user.industry} technical interview questions wrong:
+
+      ${wrongQuestionsText}
+
+      Based on these mistakes, provide a concise, specific improvement tip.
+      Focus on the knowledge gaps revealed by these wrong answers.
+      Keep the response under 2 sentences and make it encouraging.
+      Don't explicitly mention the mistakes, instead focus on what to learn/practice.
+    `;
+
+    try {
+      improvementTip = await getAIResponse(improvementPrompt);
+    } catch (error) {
+      console.error("Error generating improvement tip:", error);
+    }
+  }
+
+  try {
+    const assessment = await db.assessment.create({
+      data: {
+        userId: user.id,
+        quizScore: score,
+        questions: questionResults,
+        category: "Technical",
+        improvementTip,
+      },
+    });
+    return assessment;
+  } catch (error) {
+    console.error("Error saving quiz result:", error);
+    throw new Error("Failed to save quiz result. Please try again later.");
+  }
+}
+
+export async function getAssessments() {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+
+  const user = await db.user.findUnique({
+    where: { clerkUserId: userId },
+  });
+
+  if (!user) throw new Error("User Not Found");
+
+  try {
+    const assessments = await db.assessment.findMany({
+      where: { userId: user.id },
+      orderBy: { createdAt: "asc" },
+    });
+    return assessments;
+  } catch (error) {
+    console.error("Error fetching assessments:", error);
+    throw new Error("Failed to fetch assessments. Please try again later.");
+  }
+}
