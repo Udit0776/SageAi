@@ -3,89 +3,23 @@
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
-if (!process.env.GEMINI_API_KEY) {
-  throw new Error("GEMINI_API_KEY is not set in environment variables");
-}
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-
-// Helper to delay execution
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-async function getAIResponse(prompt) {
-  const modelNames = [
-    "gemini-2.5-flash",
-    "gemini-2.5-flash-lite",
-    "gemini-2.0-flash",
-  ];
-  const maxRetries = 3;
-
-  for (const modelName of modelNames) {
-    const model = genAI.getGenerativeModel({ model: modelName });
-
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        console.log(
-          `Trying ${modelName} (attempt ${attempt}/${maxRetries})...`,
-        );
-        const result = await model.generateContent(prompt);
-        const response = result.response;
-        return response.text();
-      } catch (error) {
-        const is503 =
-          error.message?.includes("503") ||
-          error.message?.includes("Service Unavailable");
-        const is429 =
-          error.message?.includes("429") ||
-          error.message?.includes("Too Many Requests");
-
-        if ((is503 || is429) && attempt < maxRetries) {
-          const waitTime = Math.pow(2, attempt) * 1000; // 2s, 4s, 8s
-          console.warn(
-            `${modelName} returned ${is503 ? "503" : "429"}, retrying in ${waitTime / 1000}s...`,
-          );
-          await delay(waitTime);
-          continue;
-        }
-
-        console.warn(
-          `${modelName} failed after attempt ${attempt}: ${error.message}`,
-        );
-        break; // Try next model
-      }
-    }
-  }
-
-  throw new Error(
-    "All AI models failed to respond. Please try again in a few minutes.",
-  );
-}
+import { getAIResponse } from "@/lib/gemini";
+import { extractText, getDocumentProxy } from "unpdf";
 
 export async function saveResume(content) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
   const user = await db.user.findUnique({
-    where: {
-      clerkUserId: userId,
-    },
+    where: { clerkUserId: userId },
   });
   if (!user) throw new Error("User not found");
 
   try {
     const resume = await db.resume.upsert({
-      where: {
-        userId: user.id,
-      },
-      update: {
-        content,
-      },
-      create: {
-        userId: user.id,
-        content,
-      },
+      where: { userId: user.id },
+      update: { content },
+      create: { userId: user.id, content },
     });
 
     revalidatePath("/resume");
@@ -101,17 +35,13 @@ export async function getResume() {
   if (!userId) throw new Error("Unauthorized");
 
   const user = await db.user.findUnique({
-    where: {
-      clerkUserId: userId,
-    },
+    where: { clerkUserId: userId },
   });
   if (!user) throw new Error("User not found");
 
   try {
     return await db.resume.findUnique({
-      where: {
-        userId: user.id,
-      },
+      where: { userId: user.id },
     });
   } catch (error) {
     console.error("Error fetching resume:", error.message);
@@ -124,9 +54,7 @@ export async function improveWithAI({ current, type }) {
   if (!userId) throw new Error("Unauthorized");
 
   const user = await db.user.findUnique({
-    where: {
-      clerkUserId: userId,
-    },
+    where: { clerkUserId: userId },
   });
   if (!user) throw new Error("User not found");
 
@@ -151,7 +79,107 @@ export async function improveWithAI({ current, type }) {
     const cleanedText = text.replace(/```(?:[a-z]+)?\n?|\n?```/gi, "").trim();
     return cleanedText;
   } catch (error) {
-    console.error("Error improving with AI:", error.message);
-    throw new Error("Failed to improve content with AI. Please try again.");
+    console.error("Error improving with AI:", error);
+    throw new Error(error.message || "Failed to improve content with AI");
+  }
+}
+
+export async function parsePDFResume(formData) {
+  const file = formData.get("file");
+  if (!file) throw new Error("No file provided");
+
+  const buffer = await file.arrayBuffer();
+  const base64 = Buffer.from(buffer).toString("base64");
+
+  try {
+    const pdf = await getDocumentProxy(new Uint8Array(buffer));
+    const { text } = await extractText(pdf, { mergePages: true });
+    return { base64, text };
+  } catch (error) {
+    console.error("Unpdf extraction failed, falling back to multimodal:", error);
+    return { base64, text: null };
+  }
+}
+
+export async function extractResumeFromPDF(data) {
+  const { base64, text: extractedText } = data;
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+
+  const prompt = `
+    You are an expert resume parser. I have provided a ${extractedText ? "text version" : "PDF"} of a resume.
+    Extract the following information and structure it into a JSON object:
+    {
+      "contactInfo": {
+        "email": "",
+        "mobile": "",
+        "linkedin": "",
+        "twitter": ""
+      },
+      "summary": "...",
+      "skills": "...",
+      "experience": [
+        { "title": "", "organization": "", "startDate": "", "endDate": "", "description": "", "current": false }
+      ],
+      "education": [
+        { "title": "", "organization": "", "startDate": "", "endDate": "", "description": "", "current": false }
+      ],
+      "projects": [
+        { "title": "", "link": "", "description": "" }
+      ]
+    }
+
+    Rules:
+    - Extract as much information as possible accurately.
+    - If a field is not found, leave it as an empty string or empty array.
+    - Format dates consistently (e.g., YYYY-MM).
+    - Return ONLY the JSON object. No markdown formatting.
+  `;
+
+  try {
+    const aiResponse = extractedText 
+      ? await getAIResponse(`${prompt}\n\nResume Content:\n${extractedText}`)
+      : await getAIResponse(prompt, { pdfData: base64 });
+
+    const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error("AI response did not contain valid JSON");
+    }
+    return JSON.parse(jsonMatch[0]);
+  } catch (error) {
+    console.error("Error extracting resume:", error);
+    throw new Error(error.message || "Failed to extract resume from PDF");
+  }
+}
+
+export async function tailorResumeWithAI({ currentResume, jobDescription }) {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+
+  const prompt = `
+    You are an expert ATS optimizer. 
+    Candidate Resume: """${currentResume}"""
+    Target Job Description: """${jobDescription}"""
+
+    1. Calculate a "Match Score" (0-100).
+    2. Rewrite the resume (in the same JSON structure) to better match the job.
+    
+    Return strictly as JSON:
+    {
+      "matchScore": number,
+      "tailoredResume": { ...same structure... }
+    }
+  `;
+
+  try {
+    const text = await getAIResponse(prompt);
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error("AI response did not contain valid JSON");
+    }
+    return JSON.parse(jsonMatch[0]);
+  } catch (error) {
+    console.error("Error tailoring resume:", error);
+    throw new Error(error.message || "Failed to tailor resume with AI");
   }
 }

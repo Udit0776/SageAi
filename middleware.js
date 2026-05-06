@@ -7,11 +7,13 @@ const isProtectedRoute = createRouteMatcher([
   "/ai-cover-letter(.*)",
   "/interview(.*)",
   "/onboarding(.*)",
+  "/portfolio(.*)",
 ]);
 
 const isPublicRoute = createRouteMatcher([
   "/api/inngest",
   "/",
+  "/p/(.*)",
 ]);
 
 export default clerkMiddleware(async (auth, req) => {

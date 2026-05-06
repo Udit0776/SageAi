@@ -2,29 +2,7 @@
 
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-
-const modelNames = [
-  "gemini-2.5-flash",
-  "gemini-2.5-flash-lite",
-  "gemini-2.0-flash",
-];
-
-async function getAIResponse(prompt) {
-  for (const modelName of modelNames) {
-    try {
-      const model = genAI.getGenerativeModel({ model: modelName });
-      const result = await model.generateContent(prompt);
-      return result.response.text();
-    } catch (error) {
-      console.warn(`Model ${modelName} failed, trying next...`, error.message);
-      continue;
-    }
-  }
-  throw new Error("All AI models failed to respond.");
-}
+import { getAIResponse } from "@/lib/gemini";
 
 export async function generateQuiz() {
   const { userId } = await auth();

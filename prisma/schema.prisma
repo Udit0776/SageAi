@@ -15,6 +15,7 @@ model User {
   clerkUserId     String           @unique
   email           String           @unique
   name            String?
+  username        String?          @unique
   imageUrl        String?
   industry        String?
   industryInsight IndustryInsight? @relation(fields: [industry], references: [industry])
@@ -29,6 +30,8 @@ model User {
   assessments  Assessment[]
   resume       Resume?
   coverLetters CoverLetter[]
+  portfolio    Portfolio?
+  interviewSessions InterviewSession[]
 }
 
 model Assessment {
@@ -52,6 +55,8 @@ model Resume {
   content   String   @db.Text
   atsScore  Float?
   feedback  String?
+  targetJobDescription String? @db.Text
+  matchScore           Float?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -109,4 +114,35 @@ enum MarketOutlook {
   POSITIVE
   NEUTRAL
   NEGATIVE
+}
+
+model Portfolio {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id])
+  isPublished Boolean  @default(false)
+  content     String?  @db.Text
+  templateId  String   @default("default")
+  customUrl   String?  @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model InterviewSession {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  type            String   // "behavioral" | "technical" | "hr" | "mixed"
+  targetRole      String?
+  company         String?
+  questions       Json[]   // [{question, userAnswer, scores, feedback, starAnalysis, improvedAnswer}]
+  overallScore    Float?
+  readinessScore  Float?
+  strengths       String[]
+  weaknesses      String[]
+  improvementPlan String?  @db.Text
+  rejectionRisk   String?  @db.Text
+  duration        Int?
+  createdAt       DateTime @default(now())
+  @@index([userId])
 }

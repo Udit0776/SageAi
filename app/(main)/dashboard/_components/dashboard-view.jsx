@@ -2,6 +2,8 @@
 
 import React from 'react';
 import { Badge } from '@/app/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/components/ui/tabs';
+import PerformanceAnalytics from './performance-analytics';
 import {
   TrendingUp,
   TrendingDown,
@@ -23,7 +25,7 @@ import {
   Tooltip,
 } from "recharts";
 
-const DashboardView = ({ insights }) => {
+const DashboardView = ({ insights, interviewSessions }) => {
   const salaryData = insights.salaryRanges.map((range) => ({
     name: range.role,
     min: range.min / 1000,
@@ -93,7 +95,14 @@ const DashboardView = ({ insights }) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
+      <Tabs defaultValue="insights" className="w-full">
+        <TabsList className="mb-6">
+          <TabsTrigger value="insights">Industry Insights</TabsTrigger>
+          <TabsTrigger value="analytics">Performance Analytics</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="insights" className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
         <Card className="bg-card/50 backdrop-blur-sm border-primary/10 shadow-lg hover:shadow-primary/5 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium tracking-wide uppercase text-muted-foreground">
@@ -303,6 +312,12 @@ const DashboardView = ({ insights }) => {
           </CardContent>
         </Card>
       </div>
+        </TabsContent>
+        
+        <TabsContent value="analytics">
+          <PerformanceAnalytics sessions={interviewSessions} />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 

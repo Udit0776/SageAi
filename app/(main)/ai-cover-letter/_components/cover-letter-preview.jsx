@@ -19,10 +19,13 @@ const CoverLetterPreview = ({ id, initialContent }) => {
 
   const handleSave = async () => {
     try {
-      await saveLetterFn(id, content);
-      toast.success("Cover letter saved successfully!");
+      await toast.promise(saveLetterFn(id, content), {
+        loading: "Saving cover letter...",
+        success: "Cover letter saved successfully!",
+        error: (err) => err.message || "Failed to save cover letter",
+      });
     } catch (error) {
-      toast.error(error.message || "Failed to save cover letter");
+      // Error handled by toast.promise
     }
   };
 

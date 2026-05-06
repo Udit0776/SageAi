@@ -101,20 +101,15 @@ export default function ResumeBuilder({ initialContent }) {
             .join("\n\n");
     }
 
-    useEffect(() => {
-        if (saveResult && !isSaving) {
-            toast.success("Resume saved successfully!");
-        }
-        if (saveError) {
-            toast.error(saveError.message || "Failed to save resume");
-        }
-    }, [saveResult, saveError, isSaving])
-
     const onSubmit = async (data) => {
         try {
-            await saveResumeFn(JSON.stringify(data));
+            await toast.promise(saveResumeFn(JSON.stringify(data)), {
+                loading: "Saving your resume...",
+                success: "Resume saved successfully!",
+                error: (err) => err.message || "Failed to save resume",
+            });
         } catch (error) {
-            toast.error(error.message || "Failed to save resume");
+            // Error is handled by toast.promise
         }
     }
 
@@ -266,17 +261,16 @@ export default function ResumeBuilder({ initialContent }) {
             </div>
 
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-                {/* ... existing TabsList and TabsContent ... */}
                 <TabsList className="bg-muted/50 border border-border h-10 p-1">
                     <TabsTrigger
                         value="edit"
-                        className="data-active:bg-white data-active:text-black px-8 transition-all font-semibold"
+                        className="data-active:bg-white data-active:text-black px-8 transition-all font-semibold text-xs sm:text-sm"
                     >
                         Form
                     </TabsTrigger>
                     <TabsTrigger
                         value="preview"
-                        className="data-active:bg-white data-active:text-black px-8 transition-all font-semibold"
+                        className="data-active:bg-white data-active:text-black px-8 transition-all font-semibold text-xs sm:text-sm"
                     >
                         Markdown
                     </TabsTrigger>
@@ -503,22 +497,22 @@ export default function ResumeBuilder({ initialContent }) {
                     </form>
                 </TabsContent>
                 <TabsContent value="preview" className="mt-6">
-                    <Button variant="link" type="button" className="mb-2" onClick={() => setResumeMode(resumeMode === "preview" ? "edit" : "preview")}>
+                    <Button variant="link" type="button" className="mb-2 text-xs sm:text-sm" onClick={() => setResumeMode(resumeMode === "preview" ? "edit" : "preview")}>
                         {resumeMode === "preview" ? (
                             <>
-                                <Edit className="h-4 w-4" />Edit Resume
+                                <Edit className="h-4 w-4 mr-1" />Edit Resume
                             </>
                         ) : (
                             <>
-                                <Monitor className="h-4 w-4" />Show Preview
+                                <Monitor className="h-4 w-4 mr-1" />Show Preview
                             </>
                         )}
                     </Button>
 
                     {resumeMode !== 'preview' && (
                         <div className="flex p-3 gap-2 items-center border-2 border-yellow-600 text-yellow-600 rounded mb-2">
-                            <AlertTriangle className="h-5 w-5" />
-                            <span className="text-sm">You will lose edited markdown if you update the form data.</span>
+                            <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5" />
+                            <span className="text-[10px] sm:text-sm font-medium">You will lose edited markdown if you update the form data.</span>
                         </div>
                     )}
 
