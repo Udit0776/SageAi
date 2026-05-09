@@ -19,7 +19,13 @@ const PortfolioBuilder = ({ initialPortfolio }) => {
   const [isSaving, setIsSaving] = useState(false);
   const [customUrl, setCustomUrl] = useState(portfolio?.customUrl || "");
   const [isPublished, setIsPublished] = useState(portfolio?.isPublished || false);
+  const [templateId, setTemplateId] = useState(portfolio?.templateId || "default");
   const [copied, setCopied] = useState(false);
+
+  const TEMPLATES = [
+    { id: "default", name: "Professional", desc: "Clean and corporate", color: "bg-blue-500" },
+    { id: "modern", name: "Modern Dark", desc: "Premium purple theme", color: "bg-purple-600" },
+  ];
 
   const handleGenerate = async () => {
     try {
@@ -56,6 +62,7 @@ const PortfolioBuilder = ({ initialPortfolio }) => {
         updatePortfolioSettings({
           customUrl: cleanUrl,
           isPublished,
+          templateId,
         }),
         {
           loading: "Saving settings...",
@@ -137,20 +144,40 @@ const PortfolioBuilder = ({ initialPortfolio }) => {
 
             <div className="space-y-2">
               <Label>Custom URL</Label>
-              <div className="flex rounded-md shadow-sm overflow-hidden">
-                <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-input bg-muted text-muted-foreground text-xs md:text-sm whitespace-nowrap">
+              <div className="flex rounded-md shadow-sm overflow-hidden border border-input">
+                <span className="inline-flex items-center px-3 border-r bg-muted text-muted-foreground text-xs md:text-sm whitespace-nowrap">
                   /p/
                 </span>
                 <Input
                   value={customUrl}
                   onChange={(e) => setCustomUrl(e.target.value)}
-                  className="rounded-l-none focus-visible:ring-0 text-sm h-9 md:h-10"
+                  className="rounded-none border-0 focus-visible:ring-0 text-sm h-9 md:h-10"
                   placeholder="your-name"
                 />
               </div>
             </div>
 
-            <Button onClick={handleSaveSettings} disabled={isSaving} className="w-full">
+            <div className="space-y-3 pt-2">
+              <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Select Template</Label>
+              <div className="grid grid-cols-2 gap-3">
+                 {TEMPLATES.map((t) => (
+                   <button
+                    key={t.id}
+                    onClick={() => setTemplateId(t.id)}
+                    type="button"
+                    className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${templateId === t.id ? "border-primary bg-primary/5 shadow-lg" : "border-transparent bg-muted/30 hover:bg-muted/50"}`}
+                   >
+                     <div className={`h-10 w-full rounded-lg ${t.color} opacity-40 shadow-inner`} />
+                     <div className="text-center">
+                        <p className="text-xs font-bold">{t.name}</p>
+                        <p className="text-[9px] text-muted-foreground">{t.desc}</p>
+                     </div>
+                   </button>
+                 ))}
+              </div>
+            </div>
+
+            <Button onClick={handleSaveSettings} disabled={isSaving} className="w-full h-11 font-bold shadow-lg shadow-primary/20">
               {isSaving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
               Save Settings
             </Button>

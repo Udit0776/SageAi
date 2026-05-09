@@ -65,7 +65,9 @@ export const QuizList = ({ assessments }) => {
                                             </div>
                                             <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground mt-0.5">
                                                 <Calendar className="h-3 w-3" />
-                                                {format(new Date(quiz.createdAt), "MMM dd, yyyy")}
+                                                {quiz.createdAt && !isNaN(new Date(quiz.createdAt)) 
+                                                    ? format(new Date(quiz.createdAt), "MMM dd, yyyy")
+                                                    : "N/A"}
                                             </div>
                                         </div>
                                     </div>
@@ -106,7 +108,11 @@ export const QuizList = ({ assessments }) => {
                                 </div>
                                 <div className="text-right">
                                     <p className="text-[10px] text-muted-foreground uppercase font-bold">Date</p>
-                                    <p className="text-sm font-medium">{format(new Date(selectedQuiz.createdAt), "MMM dd, yyyy")}</p>
+                                    <p className="text-sm font-medium">
+                                        {selectedQuiz.createdAt && !isNaN(new Date(selectedQuiz.createdAt))
+                                            ? format(new Date(selectedQuiz.createdAt), "MMM dd, yyyy")
+                                            : "N/A"}
+                                    </p>
                                 </div>
                             </div>
 

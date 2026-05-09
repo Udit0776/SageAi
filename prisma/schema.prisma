@@ -31,7 +31,12 @@ model User {
   resume       Resume?
   coverLetters CoverLetter[]
   portfolio    Portfolio?
-  interviewSessions InterviewSession[]
+  interviewSessions   InterviewSession[]
+  companyIntels       CompanyIntel[]
+  skillGapReports     SkillGapReport[]
+  negotiationSessions NegotiationSession[]
+  careerBytes         CareerByte[]
+  jobApplications     JobApplication[]
 }
 
 model Assessment {
@@ -135,7 +140,7 @@ model InterviewSession {
   type            String   // "behavioral" | "technical" | "hr" | "mixed"
   targetRole      String?
   company         String?
-  questions       Json[]   // [{question, userAnswer, scores, feedback, starAnalysis, improvedAnswer}]
+  questions       Json[]   // [{question, userAnswer, scores, feedback, starAnalysis, improvedAnswer, toneAnalysis}]
   overallScore    Float?
   readinessScore  Float?
   strengths       String[]
@@ -144,5 +149,74 @@ model InterviewSession {
   rejectionRisk   String?  @db.Text
   duration        Int?
   createdAt       DateTime @default(now())
+  @@index([userId])
+}
+
+model CompanyIntel {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  companyName String
+  targetRole  String?
+  content     String   @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@index([userId])
+}
+
+model SkillGapReport {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  jobTitle        String
+  company         String?
+  jobDescription  String   @db.Text
+  content         String   @db.Text
+  readinessScore  Float?
+  createdAt       DateTime @default(now())
+  @@index([userId])
+}
+
+model NegotiationSession {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  targetRole      String
+  company         String?
+  expectedSalary  Float
+  initialOffer    Float?
+  finalSalary     Float?
+  conversation    Json[]   // [{role: "recruiter"|"user", message: "..."}]
+  score           Float?   // 0-100 negotiation success
+  feedback        String?  @db.Text
+  createdAt       DateTime @default(now())
+  @@index([userId])
+}
+
+model CareerByte {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  type      String   // "tip" | "question" | "trend" | "motivation"
+  title     String
+  content   String   @db.Text
+  industry  String
+  date      DateTime @default(now())
+  @@unique([userId, date])
+  @@index([userId])
+}
+
+model JobApplication {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  company         String
+  role            String
+  status          String   // "APPLIED" | "INTERVIEWING" | "OFFERED" | "REJECTED"
+  notes           String?  @db.Text
+  nextAction      String?  // AI suggested next step
+  lastFollowUp    DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
   @@index([userId])
 }

@@ -4,7 +4,9 @@ import { notFound } from "next/navigation";
 import { Button } from "@/app/components/ui/button";
 import { Badge } from "@/app/components/ui/badge";
 import Link from "next/link";
-import { Github, Linkedin, Mail, Code2, Briefcase, GraduationCap, ArrowRight } from "lucide-react";
+import { Globe, Mail, Code2, Briefcase, GraduationCap, ArrowRight } from "lucide-react";
+
+import ModernTemplate from "./_components/template-modern";
 
 export async function generateMetadata({ params }) {
   const { customUrl } = await params;
@@ -45,6 +47,11 @@ export default async function PublicPortfolioPage({ params }) {
     );
   }
 
+  // Handle Templates
+  if (portfolio.templateId === "modern") {
+    return <ModernTemplate content={content} user={portfolio.user} />;
+  }
+
   return (
     <div className="min-h-screen bg-background text-foreground relative selection:bg-primary/30">
       {/* Background Gradients */}
@@ -53,7 +60,7 @@ export default async function PublicPortfolioPage({ params }) {
       {/* Navigation */}
       <nav className="fixed top-0 w-full z-50 border-b border-border/50 bg-background/50 backdrop-blur-md">
         <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="font-bold text-lg tracking-tight hover:text-primary transition-colors">
+          <Link href="/" className="font-bold text-lg tracking-tight hover:text-primary transition-colors text-foreground">
             {portfolio.user.name && portfolio.user.name !== "null null" ? portfolio.user.name : "Portfolio"}
           </Link>
           <div className="flex items-center gap-4">

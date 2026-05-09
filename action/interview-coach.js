@@ -144,6 +144,7 @@ export async function analyzeAnswer(question, userAnswer, category) {
     4. An improved "Ideal Version" of their answer based on their input.
     5. List any key missing elements or metrics.
     6. Identify any filler words or weak phrases.
+    7. Emotional Intelligence / Tone Analysis: Assess the overall tone, confidence level, professionalism, and empathy in the answer.
 
     Return the response in this JSON format ONLY:
     {
@@ -153,7 +154,15 @@ export async function analyzeAnswer(question, userAnswer, category) {
       "feedback": "string",
       "improvedAnswer": "string",
       "keyMissing": ["string"],
-      "fillerPhrases": ["string"]
+      "fillerPhrases": ["string"],
+      "toneAnalysis": {
+        "overallTone": "confident | passive | arrogant | nervous | balanced",
+        "confidenceScore": number (0-10),
+        "professionalismScore": number (0-10),
+        "empathyScore": number (0-10),
+        "toneBreakdown": "string (brief explanation of detected tone)",
+        "suggestions": ["string (how to adjust tone)"]
+      }
     }
   `;
 

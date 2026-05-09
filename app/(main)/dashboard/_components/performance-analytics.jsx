@@ -28,10 +28,10 @@ import {
 const PerformanceAnalytics = ({ sessions }) => {
   if (!sessions || sessions.length === 0) {
     return (
-      <Card className="bg-card/50 backdrop-blur-sm border-primary/10 shadow-lg text-center p-12">
-        <Target className="h-16 w-16 mx-auto text-muted-foreground opacity-50 mb-4" />
-        <CardTitle className="text-2xl font-bold mb-2">No Data Yet</CardTitle>
-        <CardDescription className="text-base max-w-md mx-auto">
+      <Card className="bg-card/50 backdrop-blur-sm border-primary/10 shadow-lg text-center p-8">
+        <Target className="h-12 w-12 mx-auto text-muted-foreground opacity-50 mb-4" />
+        <CardTitle className="text-xl font-bold mb-2">No Data Yet</CardTitle>
+        <CardDescription className="text-sm max-w-md mx-auto">
           Take your first AI Interview to unlock advanced performance analytics, rejection risk analysis, and your daily practice planner.
         </CardDescription>
       </Card>
@@ -81,9 +81,9 @@ const PerformanceAnalytics = ({ sessions }) => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{Math.round(avgReadiness)}%</div>
-            <Progress value={avgReadiness} className="h-2 mt-3" />
-            <p className="text-xs text-muted-foreground mt-2">Based on {sessions.length} sessions</p>
+            <div className="text-2xl font-bold">{Math.round(avgReadiness)}%</div>
+            <Progress value={avgReadiness} className="h-1.5 mt-3" />
+            <p className="text-[10px] text-muted-foreground mt-2">Based on {sessions.length} sessions</p>
           </CardContent>
         </Card>
 
@@ -95,7 +95,7 @@ const PerformanceAnalytics = ({ sessions }) => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm leading-relaxed text-foreground font-medium">
+            <p className="text-xs leading-relaxed text-foreground font-medium">
               {latestSession.rejectionRisk || "No immediate red flags detected in your latest session."}
             </p>
           </CardContent>
@@ -108,11 +108,13 @@ const PerformanceAnalytics = ({ sessions }) => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-lg font-bold truncate">{latestSession.targetRole || "General Interview"}</div>
-            <div className="text-sm text-muted-foreground mt-1">
-              {format(new Date(latestSession.createdAt), "MMM d, yyyy")}
+            <div className="text-base font-bold truncate">{latestSession.targetRole || "General Interview"}</div>
+            <div className="text-xs text-muted-foreground mt-1">
+              {latestSession.createdAt && !isNaN(new Date(latestSession.createdAt)) 
+                ? format(new Date(latestSession.createdAt), "MMM d, yyyy")
+                : "N/A"}
             </div>
-            <Badge variant="secondary" className="mt-3">Score: {latestSession.overallScore || latestSession.readinessScore || "N/A"}</Badge>
+            <Badge variant="secondary" className="mt-3 text-[10px] h-5">Score: {latestSession.overallScore || latestSession.readinessScore || "N/A"}</Badge>
           </CardContent>
         </Card>
       </div>
@@ -131,8 +133,8 @@ const PerformanceAnalytics = ({ sessions }) => {
             <div className="space-y-4">
               {practiceTasks.map((task, idx) => (
                 <div key={idx} className="flex items-start gap-3 p-3 rounded-lg bg-primary/5 border border-primary/10 transition-colors hover:bg-primary/10 cursor-default">
-                  <CheckCircle2 className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                  <span className="text-sm font-medium leading-relaxed">{task.replace(/^[-*0-9.]+\s*/, '')}</span>
+                  <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                  <span className="text-xs font-medium leading-relaxed">{task.replace(/^[-*0-9.]+\s*/, '')}</span>
                 </div>
               ))}
             </div>

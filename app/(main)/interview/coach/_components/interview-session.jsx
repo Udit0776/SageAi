@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { 
   Loader2, Sparkles, CheckCircle2, AlertCircle, ArrowRight, 
   ChevronRight, Brain, Target, Star, MessageSquare, Clock, 
-  Lightbulb, Save, XCircle
+  Lightbulb, Save, XCircle, Heart
 } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { Textarea } from "@/app/components/ui/textarea";
@@ -341,6 +341,65 @@ export default function InterviewSession() {
                       </div>
                    </div>
                 </div>
+
+                {/* EQ Feedback Section */}
+                {feedback.toneAnalysis && (
+                  <div className="bg-violet-500/5 border border-violet-500/20 rounded-2xl p-6 space-y-5">
+                    <div className="flex items-center justify-between border-b border-violet-500/10 pb-4">
+                      <div className="flex items-center gap-2 font-bold text-violet-400">
+                        <Heart className="h-5 w-5" />
+                        Emotional Intelligence
+                      </div>
+                      <Badge 
+                        className={`text-xs font-bold border-none ${
+                          feedback.toneAnalysis.overallTone === 'confident' || feedback.toneAnalysis.overallTone === 'balanced'
+                            ? 'bg-green-500/20 text-green-400'
+                            : feedback.toneAnalysis.overallTone === 'passive' || feedback.toneAnalysis.overallTone === 'nervous'
+                            ? 'bg-yellow-500/20 text-yellow-400'
+                            : 'bg-red-500/20 text-red-400'
+                        }`}
+                      >
+                        {feedback.toneAnalysis.overallTone}
+                      </Badge>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-4">
+                      {[
+                        { label: 'Confidence', score: feedback.toneAnalysis.confidenceScore, color: 'bg-blue-500' },
+                        { label: 'Professionalism', score: feedback.toneAnalysis.professionalismScore, color: 'bg-emerald-500' },
+                        { label: 'Empathy', score: feedback.toneAnalysis.empathyScore, color: 'bg-violet-500' },
+                      ].map(({ label, score, color }) => (
+                        <div key={label} className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] uppercase font-bold text-muted-foreground">{label}</span>
+                            <span className="text-xs font-bold">{score}/10</span>
+                          </div>
+                          <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                            <div className={`h-full ${color} rounded-full transition-all duration-700`} style={{ width: `${(score / 10) * 100}%` }} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {feedback.toneAnalysis.toneBreakdown && (
+                      <p className="text-[10px] text-muted-foreground leading-relaxed">{feedback.toneAnalysis.toneBreakdown}</p>
+                    )}
+
+                    {feedback.toneAnalysis.suggestions?.length > 0 && (
+                      <div className="space-y-2">
+                        <div className="text-xs font-bold text-violet-400">💡 Tone Tips</div>
+                        <ul className="space-y-1">
+                          {feedback.toneAnalysis.suggestions.map((tip, i) => (
+                            <li key={i} className="text-[10px] text-muted-foreground flex items-start gap-2">
+                              <span className="text-violet-400 mt-0.5">•</span>
+                              {tip}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 <Button onClick={handleNext} className="w-full h-12 text-sm sm:text-base font-bold" variant="secondary">
                    {currentIdx === questions.length - 1 ? (

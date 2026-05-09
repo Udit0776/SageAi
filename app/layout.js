@@ -5,6 +5,8 @@ import { dark } from "@clerk/themes";
 import { ThemeProvider } from "@/app/components/theme-provider";
 import Header from "@/app/components/header";
 import { Toaster } from "sonner";
+import AIAssistantBubble from "@/app/components/ai-assistant-bubble";
+import ScrollToTop from "@/app/components/scroll-to-top";
 
 // const inter = ComicSansMS({ subsets: ["latin"] });
 const inter = Inter({ subsets: ["latin"] });
@@ -32,19 +34,8 @@ export default function RootLayout({ children }) {
             enableSystem
             disableTransitionOnChange
           >
-            <Header />
-            <main className="min-h-screen">{children}</main>
+            {children}
             <Toaster richColors />
-
-            {/* Footer */}
-            <footer className="bg-muted/50 py-4">
-              <div className="container mx-auto px-4 text-center text-gray-200">
-                <p className="text-sm">
-                  Sage AI © {new Date().getFullYear()} Made with ❤️ by Udit
-                  Sengar
-                </p>
-              </div>
-            </footer>
           </ThemeProvider>
         </body>
       </html>
