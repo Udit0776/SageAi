@@ -59,7 +59,6 @@ const Button = React.forwardRef(({
       data-size={size}
       className={cn(buttonVariants({ variant, size, className }))}
       ref={ref}
-      suppressHydrationWarning
       {...props} />
   );
 })

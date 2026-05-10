@@ -11,7 +11,7 @@ export default function AuthLayout({ children }) {
   }, []);
 
   return (
-    <div className="flex justify-center items-center min-h-[calc(100vh-80px)]">
+    <div className="flex justify-center items-start pt-20 md:pt-40 min-h-[calc(100vh-80px)] pb-20">
       {children}
     </div>
   );
