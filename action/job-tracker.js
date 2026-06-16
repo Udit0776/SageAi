@@ -4,6 +4,7 @@ import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { getAIResponse } from "@/lib/gemini";
 import { revalidatePath } from "next/cache";
+import { registerUserActivity } from "./streak";
 
 export async function addJobApplication(data) {
   const { userId } = await auth();
@@ -25,6 +26,12 @@ export async function addJobApplication(data) {
     },
   });
 
+  try {
+    await registerUserActivity();
+  } catch (streakError) {
+    console.error("Failed to register streak activity:", streakError);
+  }
+
   revalidatePath("/job-tracker");
   return application;
 }
@@ -43,6 +50,12 @@ export async function updateJobStatus(id, newStatus) {
     where: { id, userId: user.id },
     data: { status: newStatus },
   });
+
+  try {
+    await registerUserActivity();
+  } catch (streakError) {
+    console.error("Failed to register streak activity:", streakError);
+  }
 
   revalidatePath("/job-tracker");
   return application;
@@ -78,6 +91,7 @@ export async function getJobApplications() {
 
   return await db.jobApplication.findMany({
     where: { userId: user.id },
+    include: { onboardingPlan: true },
     orderBy: { updatedAt: "desc" },
   });
 }

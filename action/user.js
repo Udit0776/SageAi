@@ -2,6 +2,7 @@
 
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
+import { checkUser } from "@/lib/checkUser";
 
 export async function updateUser(data) {
   const { userId } = await auth();
@@ -53,16 +54,8 @@ export async function getUserOnboardingStatus() {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
-  const user = await db.user.findUnique({
-    where: {
-      clerkUserId: userId,
-    },
-  });
-
-  if (!user) throw new Error("User not found");
-
   try {
-    const user = await db.user.findUnique({
+    let user = await db.user.findUnique({
       where: {
         clerkUserId: userId,
       },
@@ -70,8 +63,18 @@ export async function getUserOnboardingStatus() {
         industry: true,
       },
     });
+
+    if (!user) {
+      // If user is not found in database (e.g. newly signed up via Clerk), sync them
+      user = await checkUser();
+    }
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
     return {
-      isOnboarded: !!user?.industry,
+      isOnboarded: !!user.industry,
     };
   } catch (error) {
     console.log("Error checking onboarding status:", error);

@@ -27,7 +27,7 @@ export default function RootLayout({ children }) {
       }}
     >
       <html lang="en" suppressHydrationWarning>
-        <body className={`${inter.className} min-h-full flex flex-col`}>
+        <body className={`${inter.className} min-h-full flex flex-col`} suppressHydrationWarning>
           <ThemeProvider
             attribute="class"
             defaultTheme="dark"

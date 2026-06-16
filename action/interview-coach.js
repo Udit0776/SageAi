@@ -3,6 +3,9 @@
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { getAIResponse } from "@/lib/gemini";
+import { registerUserActivity } from "./streak";
+import { computeSemanticSimilarity } from "@/lib/nlp";
+
 
 
 export async function generateInterviewQuestions(type, targetRole, company) {
@@ -169,7 +172,13 @@ export async function analyzeAnswer(question, userAnswer, category) {
   try {
     const text = await getAIResponse(prompt);
     const cleanedText = text.replace(/```(?:json)?\n?/g, "").trim();
-    return JSON.parse(cleanedText);
+    const result = JSON.parse(cleanedText);
+
+    // Call semantic similarity local NLP endpoint
+    const similarityResult = await computeSemanticSimilarity(userAnswer, result.improvedAnswer);
+    result.semanticRelevanceScore = similarityResult ? similarityResult.score : null;
+
+    return result;
   } catch (error) {
     console.error("Error analyzing answer:", error);
     throw new Error("Failed to analyze answer.");
@@ -187,12 +196,20 @@ export async function saveInterviewSession(sessionData) {
   if (!user) throw new Error("User Not Found");
 
   try {
-    return await db.interviewSession.create({
+    const session = await db.interviewSession.create({
       data: {
         userId: user.id,
         ...sessionData,
       },
     });
+
+    try {
+      await registerUserActivity();
+    } catch (streakError) {
+      console.error("Failed to register streak activity:", streakError);
+    }
+
+    return session;
   } catch (error) {
     console.error("Error saving session:", error);
     throw new Error("Failed to save interview session.");

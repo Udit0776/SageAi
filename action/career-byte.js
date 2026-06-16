@@ -4,6 +4,7 @@ import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { getAIResponse } from "@/lib/gemini";
 import { startOfDay } from "date-fns";
+import { inngest } from "@/lib/inngest/client";
 
 export async function getDailyCareerByte() {
   const { userId } = await auth();
@@ -29,48 +30,18 @@ export async function getDailyCareerByte() {
 
   if (existingByte) return existingByte;
 
-  // Generate a new byte
-  const prompt = `
-    Generate a personalized "Career Byte" (daily tip or question) for a professional in the "${user.industry || "general"}" industry.
-    
-    Choose one of these types:
-    - "tip": A quick, actionable career tip.
-    - "question": A common interview question to ponder.
-    - "trend": A brief update on an industry trend.
-    - "motivation": A short, impactful piece of career motivation.
-    
-    Return the response in this EXACT JSON format ONLY:
-    {
-      "type": "tip | question | trend | motivation",
-      "title": "string (short, catchy title)",
-      "content": "string (1-2 sentences of high-value content)"
-    }
-  `;
+  // If no byte for today, trigger generation in the background asynchronously
+  inngest.send({
+    name: "app/career-byte.generate",
+    data: { userId: user.id, industry: user.industry || "general" }
+  }).catch(err => console.error("Failed to send Inngest event for career byte:", err));
 
-  try {
-    const text = await getAIResponse(prompt);
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error("Invalid AI response");
-    
-    const result = JSON.parse(jsonMatch[0]);
-
-    return await db.careerByte.create({
-      data: {
-        userId: user.id,
-        type: result.type,
-        title: result.title,
-        content: result.content,
-        industry: user.industry || "general",
-        date: today,
-      },
-    });
-  } catch (error) {
-    console.error("Error generating career byte:", error.message);
-    // Fallback static byte if AI fails
-    return {
-      type: "tip",
-      title: "Preparation is Key",
-      content: "Spend 15 minutes today researching a company you admire. Knowledge is power in any interview.",
-    };
-  }
+  // Return a static fallback byte immediately so the user doesn't wait
+  return {
+    type: "tip",
+    title: "Preparation is Key",
+    content: "Spend 15 minutes today researching a company you admire. Knowledge is power in any interview.",
+    industry: user.industry || "general",
+    date: today,
+  };
 }

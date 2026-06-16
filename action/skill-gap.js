@@ -4,6 +4,8 @@ import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { getAIResponse } from "@/lib/gemini";
 import { revalidatePath } from "next/cache";
+import { getPlainTextFromResume } from "@/lib/ats-scorer";
+import { computeSkillGap } from "@/lib/skill-taxonomy";
 
 export async function analyzeSkillGap(jobTitle, company, jobDescription) {
   const { userId } = await auth();
@@ -16,36 +18,29 @@ export async function analyzeSkillGap(jobTitle, company, jobDescription) {
 
   if (!user) throw new Error("User not found");
 
-  const resumeText = user.resume?.content || "No resume uploaded yet.";
+  const resumeTextRaw = user.resume?.content || "";
+  const resumeText = getPlainTextFromResume(resumeTextRaw);
+  const gapResult = computeSkillGap(resumeText, jobDescription);
 
   const prompt = `
-    You are a career strategist. Compare the candidate's resume against the following job description and provide a comprehensive skill gap analysis.
-
-    Candidate Resume:
-    """${resumeText}"""
-
-    Target Job: ${jobTitle}${company ? ` at ${company}` : ""}
-    Job Description:
-    """${jobDescription}"""
-
+    You are a career strategist. Compare the candidate's skills against the target job requirements.
+    The following skill gap has been deterministically computed for a candidate applying for: ${jobTitle}${company ? ` at ${company}` : ""}.
+    
+    Deterministic Gap Results:
+    - Readiness Score: ${gapResult.readinessScore}%
+    - Matching Skills: ${JSON.stringify(gapResult.matchingSkills)}
+    - Present Skills (User has): ${JSON.stringify(gapResult.presentSkills)}
+    - Required Skills (from Job Description): ${JSON.stringify(gapResult.requiredSkills)}
+    - Extra Skills (User has but not required): ${JSON.stringify(gapResult.extraSkills)}
+    - Missing Skills: ${JSON.stringify(gapResult.missingSkills.map(m => m.skill))}
+    
+    IMPORTANT Rules:
+    - Do NOT recompute or contradict these scores or matching/missing skills lists.
+    - Your job is ONLY to generate a 4-week learning roadmap addressing the missing skills in priority order, along with a high-level 2-3 sentence overall fit assessment.
+    
     Return the response in this EXACT JSON format ONLY:
     {
-      "readinessScore": number (0-100, how ready the candidate is for this role),
-      "overallAssessment": "string (2-3 sentences summarizing the fit)",
-      "matchingSkills": [
-        {
-          "skill": "string",
-          "confidence": number (0-100, how strongly this skill is demonstrated),
-          "evidence": "string (brief evidence from resume)"
-        }
-      ],
-      "missingSkills": [
-        {
-          "skill": "string",
-          "priority": "critical | important | nice-to-have",
-          "reason": "string (why this skill is needed for the role)"
-        }
-      ],
+      "overallAssessment": "string (2-3 sentences summarizing the fit based on the deterministic gap)",
       "roadmap": {
         "week1": {
           "focus": "string (main skill to learn)",
@@ -70,11 +65,7 @@ export async function analyzeSkillGap(jobTitle, company, jobDescription) {
       }
     }
 
-    IMPORTANT:
-    - Include at least 4-6 matching skills with realistic confidence percentages.
-    - Include at least 3-5 missing skills with appropriate priority levels.
-    - The roadmap should be actionable and specific with real resource names.
-    - Return ONLY the JSON, no markdown formatting.
+    Return ONLY the JSON, no markdown formatting.
   `;
 
   try {
@@ -85,13 +76,25 @@ export async function analyzeSkillGap(jobTitle, company, jobDescription) {
       throw new Error("AI returned invalid data format. Please try again.");
     }
 
-    let analysisData;
+    let aiResponseData;
     try {
-      analysisData = JSON.parse(jsonMatch[0]);
+      aiResponseData = JSON.parse(jsonMatch[0]);
     } catch (parseErr) {
       console.error("[SkillGap] JSON parse failed:", parseErr.message);
       throw new Error("AI returned malformed data. Please try again.");
     }
+
+    const combinedData = {
+      readinessScore: gapResult.readinessScore,
+      presentSkills: gapResult.presentSkills,
+      requiredSkills: gapResult.requiredSkills,
+      matchingSkills: gapResult.matchingSkills,
+      missingSkills: gapResult.missingSkills,
+      extraSkills: gapResult.extraSkills,
+      missingByCategory: gapResult.missingByCategory,
+      overallAssessment: aiResponseData.overallAssessment,
+      roadmap: aiResponseData.roadmap
+    };
 
     const report = await db.skillGapReport.create({
       data: {
@@ -99,8 +102,8 @@ export async function analyzeSkillGap(jobTitle, company, jobDescription) {
         jobTitle,
         company: company || null,
         jobDescription,
-        content: JSON.stringify(analysisData),
-        readinessScore: analysisData.readinessScore || null,
+        content: JSON.stringify(combinedData),
+        readinessScore: gapResult.readinessScore,
       },
     });
 

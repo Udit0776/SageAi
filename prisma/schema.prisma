@@ -37,6 +37,11 @@ model User {
   negotiationSessions NegotiationSession[]
   careerBytes         CareerByte[]
   jobApplications     JobApplication[]
+
+  careerHealthScores  CareerHealthScore[]
+  offerComparisons    OfferComparison[]
+  onboardingPlans     OnboardingPlan[]
+  streak              UserStreak?
 }
 
 model Assessment {
@@ -218,5 +223,58 @@ model JobApplication {
   lastFollowUp    DateTime?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+  onboardingPlan  OnboardingPlan?
+
   @@index([userId])
+}
+
+model CareerHealthScore {
+  id               String   @id @default(cuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  score            Float    // Overall composite 0-100 score
+  atsScoreWeight   Float    // Sub-score for ATS analysis (25%)
+  readinessWeight  Float    // Sub-score for mock interviews (25%)
+  skillGapWeight   Float    // Sub-score for skill coverage (25%)
+  kanbanWeight     Float    // Sub-score for pipeline activity (25%)
+  commentary       String   @db.Text // AI insight explaining primary drag factor
+  createdAt        DateTime @default(now())
+
+  @@index([userId])
+}
+
+model OfferComparison {
+  id             String   @id @default(cuid())
+  userId         String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  offers         Json     // Array of inputted offers: [{ company, role, baseSalary, equityBonus, workModel, location, growthPotential }]
+  comparisonData Json     // Scored rating breakdown and reasoning recommendation from Gemini
+  createdAt      DateTime @default(now())
+
+  @@index([userId])
+}
+
+model OnboardingPlan {
+  id               String   @id @default(cuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobApplicationId String   @unique
+  jobApplication   JobApplication @relation(fields: [jobApplicationId], references: [id], onDelete: Cascade)
+  role             String
+  company          String
+  phases           Json     // Array detailing Learn, Contribute, Lead milestones: [{ phase: "Learn", milestones: [{ id: "m1", text: "...", isCompleted: false }] }]
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model UserStreak {
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  currentStreak    Int      @default(0)
+  longestStreak    Int      @default(0)
+  lastActivityDate DateTime @default(now())
+  earnedBadges     String[] // Array of badge IDs: ["first_interview", "resume_pro", "streak_7", "apps_10", "offer_received", "negotiation_master"]
 }

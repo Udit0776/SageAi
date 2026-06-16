@@ -3,6 +3,7 @@
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { getAIResponse } from "@/lib/gemini";
+import { inngest } from "@/lib/inngest/client";
 
 // Helper to delay execution
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -47,27 +48,72 @@ export async function getIndustryInsights() {
   if (!user) throw new Error("User not found");
   if (!user.industry) throw new Error("Industry not set. Please complete onboarding.");
 
-  // If no insights or insights are outdated, generate new ones
-  if (!user.industryInsight || user.industryInsight.nextUpdate < new Date()) {
-    const insights = await generateAIInsights(user.industry);
+  const hasNoInsights = !user.industryInsight;
+  const isOutdated = user.industryInsight && user.industryInsight.nextUpdate < new Date();
 
-    const industryInsight = await db.industryInsight.upsert({
-      where: { industry: user.industry },
-      update: {
-        ...insights,
-        lastUpdated: new Date(),
-        nextUpdate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      },
-      create: {
-        industry: user.industry,
-        ...insights,
-        lastUpdated: new Date(),
-        nextUpdate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      },
-    });
+  // If no insights or insights are outdated, trigger background updates asynchronously
+  if (hasNoInsights || isOutdated) {
+    console.log(`[Dashboard] Industry insights for "${user.industry}" are outdated/missing. Dispatching background Inngest event.`);
+    inngest.send({
+      name: "app/industry-insights.generate",
+      data: { industry: user.industry },
+    }).catch(err => console.error("Failed to send Inngest event for industry insights:", err));
+  }
 
-    return industryInsight;
+  // If we don't have insights at all in the DB, return a temporary static fallback immediately
+  if (hasNoInsights) {
+    return {
+      industry: user.industry,
+      salaryRanges: [
+        { role: "Software Engineer", min: 400000, max: 1200000, median: 800000, location: "Remote" },
+        { role: "Product Manager", min: 600000, max: 1800000, median: 1100000, location: "Remote" },
+        { role: "Data Scientist", min: 500000, max: 1500000, median: 1000000, location: "Remote" },
+        { role: "UX Designer", min: 350000, max: 1000000, median: 650000, location: "Remote" },
+        { role: "DevOps Engineer", min: 450000, max: 1400000, median: 900000, location: "Remote" }
+      ],
+      growthRate: 12.5,
+      demandLevel: "MEDIUM",
+      topSkills: ["Problem Solving", "Communication", "Technical Skills", "Teamwork", "Adaptability"],
+      marketOutlook: "NEUTRAL",
+      keyTrends: [
+        "Increasing adoption of artificial intelligence and machine learning tools.",
+        "Growing emphasis on remote and hybrid collaboration frameworks.",
+        "Increased focus on data security, privacy, and regulatory compliance.",
+        "Rise of low-code/no-code platforms for rapid development cycles.",
+        "Shift towards continuous integration and automated testing workflows."
+      ],
+      recommendedSkills: [
+        "Continuous Learning",
+        "Cross-functional Collaboration",
+        "Systems Thinking",
+        "Data-driven Decision Making",
+        "Emotional Intelligence"
+      ],
+      lastUpdated: new Date(0), // Outdated to trigger refresh indicator
+      nextUpdate: new Date(),
+    };
   }
 
   return user.industryInsight;
+}
+
+export async function generateFunnelCommentary(funnelData) {
+  const prompt = `
+    You are an expert career advisor. Analyze this job application conversion funnel:
+    - Total Applications (Applied): ${funnelData.applied}
+    - Reached Interviewing: ${funnelData.interviewing}
+    - Reached Offered: ${funnelData.offered}
+    
+    Provide a concise, 1-2 sentence diagnostic commentary explaining what the drop-off numbers suggest and how to improve.
+    If applied-to-interview drop-off is high, suggest resume tailoring.
+    If interview-to-offer drop-off is high, suggest mock interview practice.
+    Do not use markdown formatting. Keep it brief (max 150 characters).
+  `;
+  try {
+    const text = await getAIResponse(prompt);
+    return text.trim();
+  } catch (error) {
+    console.error("Error generating funnel commentary:", error);
+    return "Keep applying and tracking your applications to generate diagnostic drop-off insights.";
+  }
 }

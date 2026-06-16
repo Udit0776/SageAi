@@ -71,7 +71,7 @@ export async function generateCompanyBattlePlan(companyName, targetRole) {
   `;
 
   try {
-    const text = await getAIResponse(prompt);
+    const text = await getAIResponse(prompt, { useSearch: true });
 
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {

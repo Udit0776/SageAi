@@ -84,37 +84,37 @@
 }
 
 .dark {
-  --background: oklch(0 0 0);
+  --background: oklch(0.08 0.01 250);
   --foreground: oklch(0.985 0 0);
-  --card: oklch(0 0 0);
+  --card: oklch(0.12 0.01 250);
   --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0 0 0);
+  --popover: oklch(0.1 0.01 250);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
+  --primary: oklch(0.6 0.18 260); /* Premium Indigo */
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.2 0.01 250);
   --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0 0 0);
+  --muted: oklch(0.15 0.01 250);
+  --muted-foreground: oklch(0.7 0.01 250);
+  --accent: oklch(0.15 0.01 250);
   --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
+  --destructive: oklch(0.6 0.18 20);
+  --border: rgba(255, 255, 255, 0.06);
+  --input: rgba(255, 255, 255, 0.08);
+  --ring: oklch(0.6 0.18 260);
+  --chart-1: oklch(0.6 0.18 260);
+  --chart-2: oklch(0.7 0.15 190);
+  --chart-3: oklch(0.8 0.12 120);
+  --chart-4: oklch(0.5 0.2 320);
+  --chart-5: oklch(0.6 0.15 40);
+  --sidebar: oklch(0.12 0.01 250);
   --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary: oklch(0.6 0.18 260);
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent: oklch(0.2 0.01 250);
   --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --sidebar-border: rgba(255, 255, 255, 0.06);
+  --sidebar-ring: oklch(0.6 0.18 260);
 }
 
 @layer base {
@@ -126,6 +126,7 @@
   }
   html {
     @apply font-sans;
+    scroll-behavior: smooth;
   }
 }
 
@@ -137,15 +138,15 @@
   height: 100%;
   background: linear-gradient(
     to right,
-    rgba(255, 255, 255, 0.05) 1px,
+    rgba(255, 255, 255, 0.015) 1px,
     transparent 1px
   ),
   linear-gradient(
     to bottom,
-    rgba(255, 255, 255, 0.05) 1px,
+    rgba(255, 255, 255, 0.015) 1px,
     transparent 1px
   );
-  background-size: 50px 50px;
+  background-size: 60px 60px;
   pointer-events: none;
   z-index: -1;
 }
@@ -159,13 +160,13 @@
   height: 100%;
   background: radial-gradient(
     circle at center,
-    transparent 20%,
-    var(--background) 100%
+    transparent 40%,
+    #030303 100%
   );
 }
 
 @utility gradient {
-  @apply bg-gradient-to-b from-gray-400 via-gray-200 to-gray-600;
+  @apply bg-gradient-to-b from-white via-zinc-200 to-zinc-400;
 }
 
 @utility gradient-title {
@@ -173,11 +174,11 @@
 }
 
 .hero-image-wrapper {
-  perspective: 1000px;
+  perspective: 1200px;
 }
 
 .hero-image {
-  transform: rotateX(15deg) scale(1);
+  transform: none !important;
   will-change: transform;
 }
 
@@ -211,4 +212,249 @@
 
 .wmde-markdown p, .wmde-markdown li {
   margin-bottom: 0.4em !important;
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
+}
+.shimmer-text {
+    background: linear-gradient(90deg, #818cf8 0%, #ffffff 50%, #818cf8 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 5s linear infinite;
+}
+.glass-card {
+    background: rgba(255, 255, 255, 0.015);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.glass-card:hover {
+    border-color: rgba(99, 102, 241, 0.25);
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.025);
+    box-shadow: 0 10px 30px -15px rgba(0, 0, 0, 0.7), 0 0 20px rgba(99, 102, 241, 0.03);
+}
+@keyframes scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+.animate-scroll {
+    display: flex;
+    width: max-content;
+    animation: scroll 40s linear infinite;
+}
+.mesh-gradient {
+    background-color: #030303;
+    background-image: 
+        radial-gradient(at 50% 0%, rgba(99, 102, 241, 0.08) 0, transparent 55%), 
+        radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.02) 0, transparent 40%);
+}
+
+@keyframes radar-sweep {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+.animate-radar-sweep {
+    animation: radar-sweep 6s linear infinite;
+    transform-origin: 50px 50px;
+}
+
+@keyframes radar-blip-default {
+    0% { opacity: 0.12; }
+    10% { opacity: 1; filter: drop-shadow(0 0 4px rgba(99, 102, 241, 0.85)); }
+    35% { opacity: 0.4; }
+    70% { opacity: 0.12; }
+    100% { opacity: 0.12; }
+}
+.animate-radar-blip-default {
+    animation: radar-blip-default 6s infinite ease-out;
+}
+
+@keyframes radar-blip-fade {
+    0% { opacity: 0; }
+    10% { opacity: 1; filter: drop-shadow(0 0 4px rgba(99, 102, 241, 0.85)); }
+    35% { opacity: 0.3; }
+    55% { opacity: 0; }
+    100% { opacity: 0; }
+}
+.animate-radar-blip-fade {
+    animation: radar-blip-fade 6s infinite ease-out;
+}
+
+/* Platform Container Overrides - To scale down text size & padding on platform workspace pages */
+.platform-container {
+  font-size: 12.5px !important;
+}
+
+/* Scaling down font-size utilities in platform view */
+.platform-container .text-base {
+  font-size: 0.825rem !important; /* ~13.2px */
+}
+.platform-container .text-sm {
+  font-size: 0.775rem !important; /* ~12.4px */
+}
+.platform-container .text-xs {
+  font-size: 0.7rem !important; /* ~11.2px */
+}
+.platform-container .text-lg {
+  font-size: 0.925rem !important; /* ~14.8px */
+}
+.platform-container .text-xl {
+  font-size: 1.0rem !important; /* ~16px */
+}
+.platform-container .text-2xl {
+  font-size: 1.15rem !important; /* ~18.4px */
+}
+.platform-container .text-3xl {
+  font-size: 1.3rem !important; /* ~20.8px */
+}
+.platform-container .text-4xl {
+  font-size: 1.45rem !important; /* ~23.2px */
+}
+
+/* Scale down headings explicitly */
+.platform-container h1, 
+.platform-container [class*="text-2xl"],
+.platform-container [class*="text-3xl"] {
+  font-size: 1.2rem !important; /* ~19.2px */
+  line-height: 1.5rem !important;
+}
+
+.platform-container h2 {
+  font-size: 1.0rem !important; /* ~16px */
+}
+
+.platform-container h3 {
+  font-size: 0.9rem !important; /* ~14.4px */
+}
+
+/* Scale down inputs, buttons, and form components */
+.platform-container select,
+.platform-container input,
+.platform-container textarea,
+.platform-container button:not(.UserButton) {
+  font-size: 0.775rem; /* ~12.4px, matches text-sm default, without !important to allow class overrides */
+}
+
+/* Make card and container paddings smaller */
+.platform-container .p-6 {
+  padding: 0.75rem !important;
+}
+.platform-container .p-8 {
+  padding: 1rem !important;
+}
+.platform-container .py-10 {
+  padding-top: 1.25rem !important;
+  padding-bottom: 1.25rem !important;
+}
+.platform-container .pt-10 {
+  padding-top: 1.25rem !important;
+}
+.platform-container .pb-20 {
+  padding-bottom: 1.5rem !important;
+}
+.platform-container .gap-8 {
+  gap: 1rem !important;
+}
+.platform-container .gap-6 {
+  gap: 0.75rem !important;
+}
+.platform-container .space-y-8 > :not([hidden]) ~ :not([hidden]) {
+  margin-top: 1rem !important;
+}
+.platform-container .space-y-6 > :not([hidden]) ~ :not([hidden]) {
+  margin-top: 0.75rem !important;
+}
+
+/* Custom Scrollbar Utilities to hide native Windows scrollbar tracks and scroll buttons */
+.custom-scrollbar {
+  -ms-overflow-style: none !important;  /* IE and Edge */
+  scrollbar-width: none !important;  /* Firefox */
+}
+.custom-scrollbar::-webkit-scrollbar {
+  display: none !important; /* Chrome, Safari, Opera */
+}
+
+/* Resume Preview Paper style to look like an A4 sheet */
+.resume-preview-paper .w-md-editor-preview {
+  background-color: #ffffff !important;
+  color: #111111 !important;
+  padding: 20mm 15mm !important;
+  font-family: 'Georgia', 'Times New Roman', Times, serif !important;
+  font-size: 11px !important;
+  line-height: 1.4 !important;
+}
+
+/* Ensure the inner markdown container is transparent and uses dark text */
+.resume-preview-paper .w-md-editor-preview .wmde-markdown {
+  background-color: transparent !important;
+  color: #111111 !important;
+  font-family: 'Georgia', 'Times New Roman', Times, serif !important;
+}
+
+.resume-preview-paper .w-md-editor-preview .wmde-markdown h1 {
+  color: #000000 !important;
+  font-size: 1.8em !important;
+  font-weight: bold !important;
+  text-align: center !important;
+  border-bottom: 0 !important;
+  margin-bottom: 5px !important;
+  padding-bottom: 0 !important;
+}
+
+.resume-preview-paper .w-md-editor-preview .wmde-markdown h2 {
+  color: #000000 !important;
+  font-size: 1.15em !important;
+  border-bottom: 1.5px solid #222 !important;
+  text-transform: uppercase !important;
+  font-weight: bold !important;
+  padding-bottom: 3px !important;
+  margin-top: 1.4em !important;
+  margin-bottom: 0.5em !important;
+}
+
+.resume-preview-paper .w-md-editor-preview .wmde-markdown h3 {
+  color: #111111 !important;
+  font-size: 1em !important;
+  font-weight: bold !important;
+  margin-top: 0.8em !important;
+  margin-bottom: 0.3em !important;
+  border-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.resume-preview-paper .w-md-editor-preview .wmde-markdown p,
+.resume-preview-paper .w-md-editor-preview .wmde-markdown li {
+  color: #222222 !important;
+  font-size: 11px !important;
+  margin-bottom: 0.3em !important;
+  line-height: 1.4 !important;
+}
+
+.resume-preview-paper .w-md-editor-preview .wmde-markdown ul,
+.resume-preview-paper .w-md-editor-preview .wmde-markdown ol {
+  padding-left: 1.5em !important;
+}
+
+.resume-preview-paper .w-md-editor-preview .wmde-markdown a {
+  color: #000000 !important;
+  text-decoration: underline !important;
+}
+
+.resume-preview-paper .w-md-editor-preview .wmde-markdown hr {
+  border: 0 !important;
+  border-top: 1px solid #ccc !important;
+  margin: 10px 0 !important;
+}
+
+/* Ensure floated dates are visible and positioned correctly in editor preview */
+.resume-preview-paper .w-md-editor-preview .wmde-markdown span[style*="float: right"] {
+  float: right !important;
+  font-weight: normal !important;
+  font-size: 0.85em !important;
+  color: #555 !important;
+  font-family: sans-serif !important;
 }
