@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Badge } from "@/app/components/ui/badge";
 import { Button } from "@/app/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/app/components/ui/dialog";
+import { Progress } from "@/app/components/ui/progress";
 import { generateOnboardingPlan } from "@/action/onboarding-plan";
 import { useRouter } from "next/navigation";
 import {
@@ -43,6 +44,7 @@ export default function KanbanBoard({ initialJobs }) {
   const [selectedJob, setSelectedJob] = useState(null);
   const [showOnboardingModal, setShowOnboardingModal] = useState(false);
   const [isGeneratingPlan, setIsGeneratingPlan] = useState(false);
+  const [scoringJobDetail, setScoringJobDetail] = useState(null);
 
   useEffect(() => {
     setJobs(initialJobs);
@@ -55,8 +57,6 @@ export default function KanbanBoard({ initialJobs }) {
   const handleStatusUpdate = async (id, newStatus) => {
     try {
       await updateJobStatus(id, newStatus);
-      
-      // Update status locally, preserving custom inclusion links
       setJobs(jobs.map(j => j.id === id ? { ...j, status: newStatus } : j));
       toast.success(`Moved to ${newStatus}`);
 
@@ -109,18 +109,33 @@ export default function KanbanBoard({ initialJobs }) {
     }
   };
 
+  // Compute average success probability across Applied applications
+  const getAverageAppliedProbability = () => {
+    const appliedJobs = jobs.filter(j => j.status === "APPLIED");
+    if (appliedJobs.length === 0) return 0;
+    const total = appliedJobs.reduce((acc, j) => acc + (j.successProbability?.score || 0), 0);
+    return Math.round(total / appliedJobs.length);
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {STATUS_COLUMNS.map((column) => (
         <div key={column.value} className="flex flex-col gap-4">
-          <div className="flex items-center justify-between px-2">
-            <h3 className="font-bold text-sm uppercase tracking-widest flex items-center gap-2">
-              <span className={`h-2 w-2 rounded-full ${column.color.split(' ')[0]}`} />
-              {column.label}
-              <Badge variant="secondary" className="h-5 px-1.5 text-[10px] bg-muted/50 border-none">
-                {jobs.filter(j => j.status === column.value).length}
-              </Badge>
-            </h3>
+          <div className="flex flex-col gap-1 px-2">
+            <div className="flex items-center justify-between">
+              <h3 className="font-bold text-sm uppercase tracking-widest flex items-center gap-2">
+                <span className={`h-2 w-2 rounded-full ${column.color.split(' ')[0]}`} />
+                {column.label}
+                <Badge variant="secondary" className="h-5 px-1.5 text-[10px] bg-muted/50 border-none">
+                  {jobs.filter(j => j.status === column.value).length}
+                </Badge>
+              </h3>
+            </div>
+            {column.value === "APPLIED" && jobs.filter(j => j.status === "APPLIED").length > 0 && (
+              <p className="text-[10px] text-muted-foreground font-semibold mt-0.5">
+                Avg success probability: <span className="text-primary font-bold">{getAverageAppliedProbability()}%</span>
+              </p>
+            )}
           </div>
 
           <div className="flex flex-col gap-4 min-h-[500px] p-2 rounded-2xl bg-muted/20 border border-dashed border-muted">
@@ -167,6 +182,30 @@ export default function KanbanBoard({ initialJobs }) {
                 </CardHeader>
                 
                 <CardContent className="p-4 py-2 space-y-3">
+                  {/* Success Probability Pill */}
+                  {job.successProbability && (
+                    <div className="flex items-center justify-between border-b border-muted/20 pb-2">
+                      <span className="text-[9px] uppercase font-bold text-muted-foreground">Success Prob.</span>
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setScoringJobDetail(job);
+                        }}
+                        className={`text-[9px] font-black px-2 py-0.5 rounded-full border cursor-pointer hover:brightness-110 transition-all ${
+                          job.successProbability.color === "green" 
+                            ? "bg-green-500/10 text-green-500 border-green-500/25"
+                            : job.successProbability.color === "amber"
+                            ? "bg-amber-500/10 text-amber-500 border-amber-500/25"
+                            : job.successProbability.color === "red"
+                            ? "bg-red-500/10 text-red-500 border-red-500/25"
+                            : "bg-zinc-500/10 text-zinc-450 border-zinc-550/25"
+                        }`}
+                      >
+                        {job.successProbability.label} {job.successProbability.score}%
+                      </button>
+                    </div>
+                  )}
+
                   {job.nextAction ? (
                     <div className="p-2.5 rounded-xl bg-primary/5 border border-primary/10 space-y-1 animate-in zoom-in-95 duration-300">
                       <div className="flex items-center gap-1.5 text-[9px] font-black uppercase text-primary tracking-tighter">
@@ -278,6 +317,107 @@ export default function KanbanBoard({ initialJobs }) {
                   Generate Plan
                 </>
               )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Success Probability Details Dialog Popup */}
+      <Dialog open={!!scoringJobDetail} onOpenChange={() => setScoringJobDetail(null)}>
+        <DialogContent className="bg-[#09090b] border border-white/10 text-white rounded-2xl max-w-md p-6 shadow-2xl">
+          <DialogHeader className="space-y-2">
+            <div className="flex items-center justify-between border-b border-white/5 pb-3">
+              <div>
+                <DialogTitle className="text-base font-bold">Success Probability</DialogTitle>
+                <DialogDescription className="text-[10px] text-zinc-400">
+                  {scoringJobDetail?.role} at {scoringJobDetail?.company}
+                </DialogDescription>
+              </div>
+              {scoringJobDetail?.successProbability && (
+                <Badge className={`text-xs font-black border uppercase ${
+                  scoringJobDetail.successProbability.color === "green"
+                    ? "bg-green-500/20 text-green-400 border-green-500/30"
+                    : scoringJobDetail.successProbability.color === "amber"
+                    ? "bg-amber-500/20 text-amber-400 border-amber-500/30"
+                    : scoringJobDetail.successProbability.color === "red"
+                    ? "bg-red-500/20 text-red-400 border-red-500/30"
+                    : "bg-zinc-500/20 text-zinc-400 border-zinc-550/30"
+                }`}>
+                  {scoringJobDetail.successProbability.label} {scoringJobDetail.successProbability.score}%
+                </Badge>
+              )}
+            </div>
+          </DialogHeader>
+          
+          {scoringJobDetail?.successProbability && (
+            <div className="space-y-4 py-2">
+              <div className="space-y-3">
+                <h4 className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Breakdown Score</h4>
+                
+                {/* 1. Resume Alignment */}
+                <div className="space-y-1">
+                  <div className="flex justify-between text-xs font-medium">
+                    <span className="text-zinc-300">Resume-JD Alignment</span>
+                    <span className="font-bold">{scoringJobDetail.successProbability.breakdown.alignment.toFixed(0)}/30 pts</span>
+                  </div>
+                  <Progress value={(scoringJobDetail.successProbability.breakdown.alignment / 30) * 100} className="h-1.5 bg-zinc-800" />
+                </div>
+
+                {/* 2. Recency */}
+                <div className="space-y-1">
+                  <div className="flex justify-between text-xs font-medium">
+                    <span className="text-zinc-300">Application Recency</span>
+                    <span className="font-bold">{scoringJobDetail.successProbability.breakdown.recency}/20 pts</span>
+                  </div>
+                  <Progress value={(scoringJobDetail.successProbability.breakdown.recency / 20) * 100} className="h-1.5 bg-zinc-800" />
+                </div>
+
+                {/* 3. Profile Completeness */}
+                <div className="space-y-1">
+                  <div className="flex justify-between text-xs font-medium">
+                    <span className="text-zinc-300">Profile Completeness</span>
+                    <span className="font-bold">{scoringJobDetail.successProbability.breakdown.profileCompleteness}/20 pts</span>
+                  </div>
+                  <Progress value={(scoringJobDetail.successProbability.breakdown.profileCompleteness / 20) * 100} className="h-1.5 bg-zinc-800" />
+                </div>
+
+                {/* 4. Cover Letter */}
+                <div className="space-y-1">
+                  <div className="flex justify-between text-xs font-medium">
+                    <span className="text-zinc-300">Cover Letter Generated</span>
+                    <span className="font-bold">{scoringJobDetail.successProbability.breakdown.coverLetter}/15 pts</span>
+                  </div>
+                  <Progress value={(scoringJobDetail.successProbability.breakdown.coverLetter / 15) * 100} className="h-1.5 bg-zinc-800" />
+                </div>
+
+                {/* 5. Follow-up Activity */}
+                <div className="space-y-1">
+                  <div className="flex justify-between text-xs font-medium">
+                    <span className="text-zinc-300">Follow-Up Activity</span>
+                    <span className="font-bold">{scoringJobDetail.successProbability.breakdown.followUp}/15 pts</span>
+                  </div>
+                  <Progress value={(scoringJobDetail.successProbability.breakdown.followUp / 15) * 100} className="h-1.5 bg-zinc-800" />
+                </div>
+              </div>
+
+              {/* Recommendation Callout */}
+              <div className="p-3 bg-primary/10 border border-primary/20 rounded-xl space-y-1 mt-2">
+                <div className="flex items-center gap-1.5 text-[9px] font-black uppercase text-primary tracking-wider">
+                  <Sparkles className="h-3 w-3" /> Recommended Action
+                </div>
+                <p className="text-xs font-bold leading-normal text-white">{scoringJobDetail.successProbability.topRecommendation}</p>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter className="mt-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setScoringJobDetail(null)}
+              className="w-full border-white/5 hover:bg-white/5 text-xs h-9 rounded-xl cursor-pointer text-zinc-300 hover:text-white"
+            >
+              Close Breakdown
             </Button>
           </DialogFooter>
         </DialogContent>

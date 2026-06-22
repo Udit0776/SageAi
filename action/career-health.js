@@ -5,6 +5,44 @@ import { auth } from "@clerk/nextjs/server";
 import { getAIResponse } from "@/lib/gemini";
 import { subDays } from "date-fns";
 import { inngest } from "@/lib/inngest/client";
+import { computeLinearRegression, generateTrendInsight } from "@/lib/trend-analysis";
+
+// Helper to compute linear regression on user's last 12 scores and append trend metadata
+async function appendTrendMetrics(userId, baseScoreRecord) {
+  const history = await db.careerHealthScore.findMany({
+    where: { userId },
+    orderBy: { createdAt: "desc" },
+    take: 12,
+  });
+
+  let finalHistory = [...history];
+  if (baseScoreRecord && !finalHistory.some(h => h.id === baseScoreRecord.id)) {
+    finalHistory.unshift(baseScoreRecord);
+  }
+
+  // Sort oldest first (chronological)
+  finalHistory.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+
+  const dataPoints = finalHistory.map(h => ({
+    timestamp: h.createdAt,
+    score: h.atsScoreWeight || 0
+  }));
+
+  const regressionResult = computeLinearRegression(dataPoints);
+  const currentScore = baseScoreRecord ? baseScoreRecord.atsScoreWeight : (dataPoints[dataPoints.length - 1]?.score || 0);
+  const resumeTrendInsight = generateTrendInsight(regressionResult, currentScore, dataPoints);
+
+  // Return a clean plain object with trend analysis fields
+  const plainObject = JSON.parse(JSON.stringify(baseScoreRecord || {}));
+  
+  return {
+    ...plainObject,
+    resumeTrend: regressionResult.trend,
+    resumeTrendInsight,
+    resumeRSquared: regressionResult.rSquared,
+    atsScoreHistory: dataPoints.slice(-8).map(d => d.score)
+  };
+}
 
 export async function calculateBaselineHealthScore(clerkUserId) {
   const user = await db.user.findUnique({
@@ -81,7 +119,7 @@ export async function calculateBaselineHealthScore(clerkUserId) {
     },
   });
 
-  return savedScore;
+  return await appendTrendMetrics(user.id, savedScore);
 }
 
 export async function calculateCareerHealthScore(explicitClerkUserId = null) {
@@ -219,7 +257,7 @@ export async function calculateCareerHealthScore(explicitClerkUserId = null) {
     });
   }
 
-  return savedScore;
+  return await appendTrendMetrics(user.id, savedScore);
 }
 
 export async function getCareerHealthHistory() {
@@ -308,5 +346,5 @@ export async function getLatestCareerHealthScore() {
     }).catch(err => console.error("Failed to send Inngest event for career health:", err));
   }
 
-  return latest;
+  return await appendTrendMetrics(user.id, latest);
 }

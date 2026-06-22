@@ -10,12 +10,14 @@ import { Label } from "@/app/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/app/components/ui/radio-group";
 import { format } from "date-fns";
 import { Badge } from "@/app/components/ui/badge";
+import SessionReport from "./session-report";
 
 export default function InterviewSetup({ user, pastSessions }) {
   const [type, setType] = useState("mixed");
   const [targetRole, setTargetRole] = useState(user?.industry || "");
   const [company, setCompany] = useState("");
   const [loading, setLoading] = useState(false);
+  const [selectedSession, setSelectedSession] = useState(null);
   const router = useRouter();
 
   const handleStart = () => {
@@ -34,6 +36,27 @@ export default function InterviewSetup({ user, pastSessions }) {
     { id: "hr", title: "HR / Culture", description: "Values & fit", icon: Briefcase },
     { id: "mixed", title: "Mixed Round", description: "A balanced interview", icon: Sparkles },
   ];
+
+  if (selectedSession) {
+    return (
+      <div className="space-y-4">
+        <Button 
+          variant="ghost" 
+          onClick={() => setSelectedSession(null)} 
+          className="text-xs font-semibold text-muted-foreground hover:text-foreground cursor-pointer flex items-center gap-1.5 px-0"
+        >
+          ← Back to Interview Setup
+        </Button>
+        <SessionReport 
+          data={selectedSession} 
+          results={selectedSession.questions} 
+          type={selectedSession.type} 
+          role={selectedSession.targetRole}
+          onBack={() => setSelectedSession(null)}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4 pb-4">
@@ -124,7 +147,11 @@ export default function InterviewSetup({ user, pastSessions }) {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {pastSessions.slice(0, 4).map((session) => (
-                  <Card key={session.id} className="hover:border-primary/30 transition-all cursor-pointer group">
+                  <Card 
+                    key={session.id} 
+                    onClick={() => setSelectedSession(session)}
+                    className="hover:border-primary/30 transition-all cursor-pointer group"
+                  >
                     <CardContent className="p-2.5 flex items-center justify-between">
                       <div className="space-y-0.5">
                         <div className="font-bold text-xs flex items-center gap-1.5">

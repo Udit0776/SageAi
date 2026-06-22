@@ -122,6 +122,17 @@ export default function InterviewSession() {
     stopSpeaking();
     setManuallyStopped(false);
 
+    // Save speech analytics for the current question
+    const questionWords = userAnswer.toLowerCase().split(/\s+/).filter(Boolean);
+    const wordCount = questionWords.length;
+    const speechStats = {
+      fillerWords: voiceMode ? { ...analytics.fillerWords } : {},
+      speechPace: voiceMode ? analytics.speechPace : 0,
+      totalFillers: voiceMode ? analytics.totalFillers : 0,
+      wordCount,
+      voiceModeActive: voiceMode
+    };
+
     setIsAnalyzing(true);
     try {
       const result = await analyzeAnswer(
@@ -133,6 +144,7 @@ export default function InterviewSession() {
       setAllResults(prev => [...prev, {
         question: questions[currentIdx].question,
         userAnswer,
+        speechStats,
         ...result
       }]);
     } catch (error) {
@@ -161,6 +173,40 @@ export default function InterviewSession() {
       const report = await generateSessionReport(allResults);
       setReportData(report);
       setShowReport(true);
+
+      // Aggregate speech stats from allResults
+      let totalWords = 0;
+      let totalFillers = 0;
+      const combinedFillerBreakdown = {};
+      let totalSpeakingTimeMinutes = 0;
+
+      allResults.forEach(r => {
+        const stats = r.speechStats;
+        if (stats && stats.voiceModeActive) {
+          totalWords += stats.wordCount;
+          totalFillers += stats.totalFillers;
+          
+          if (stats.fillerWords) {
+            Object.entries(stats.fillerWords).forEach(([word, count]) => {
+              combinedFillerBreakdown[word] = (combinedFillerBreakdown[word] || 0) + count;
+            });
+          }
+
+          if (stats.speechPace > 0) {
+            totalSpeakingTimeMinutes += stats.wordCount / stats.speechPace;
+          }
+        }
+      });
+
+      const fillerWordCount = totalFillers;
+      const fillerWordBreakdown = combinedFillerBreakdown;
+      let averageWPM = null;
+      let fillerWordRate = null;
+
+      if (totalSpeakingTimeMinutes > 0) {
+        averageWPM = Math.round(totalWords / totalSpeakingTimeMinutes);
+        fillerWordRate = parseFloat((totalFillers / totalSpeakingTimeMinutes).toFixed(2));
+      }
       
       // Auto-save to DB
       await saveInterviewSession({
@@ -169,6 +215,10 @@ export default function InterviewSession() {
         company,
         questions: allResults,
         duration: Math.floor((Date.now() - startTime) / 1000),
+        fillerWordCount,
+        fillerWordRate,
+        averageWPM,
+        fillerWordBreakdown,
         ...report
       });
       toast.success("Interview session saved successfully!");

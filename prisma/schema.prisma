@@ -153,6 +153,11 @@ model InterviewSession {
   improvementPlan String?  @db.Text
   rejectionRisk   String?  @db.Text
   duration        Int?
+  fillerWordCount    Int?
+  fillerWordRate     Float?
+  averageWPM         Float?
+  fillerWordBreakdown Json?
+  communicationScore Float?
   createdAt       DateTime @default(now())
   @@index([userId])
 }

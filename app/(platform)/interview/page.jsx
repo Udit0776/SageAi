@@ -5,6 +5,8 @@ import { QuizList } from "./_components/quiz-list";
 import { StatsCards } from "./_components/stats-card";
 import Link from "next/link";
 import { Button } from "@/app/components/ui/button";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/app/components/ui/tabs";
+import CommunicationTrends from "./coach/_components/communication-trends";
 
 export default async function InterviewPage() {
 
@@ -30,16 +32,28 @@ export default async function InterviewPage() {
               </Button>
             </Link>
           </div>
-
         </div>
 
-        {/* Content goes here */}
-        <div className="space-y-8">
-          <StatsCards assessments={assessments} />
-          <PerformanceChart assessments={assessments} />
-          <QuizList assessments={assessments} />
-        </div>
+        <Tabs defaultValue="quizzes" className="w-full space-y-6">
+          <TabsList className="bg-zinc-900/50 border border-zinc-800 p-1">
+            <TabsTrigger value="quizzes" className="font-semibold px-4 cursor-pointer">
+              Mock Quizzes
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="font-semibold px-4 cursor-pointer">
+              Communication Analytics
+            </TabsTrigger>
+          </TabsList>
 
+          <TabsContent value="quizzes" className="space-y-8 mt-2">
+            <StatsCards assessments={assessments} />
+            <PerformanceChart assessments={assessments} />
+            <QuizList assessments={assessments} />
+          </TabsContent>
+
+          <TabsContent value="analytics" className="mt-2">
+            <CommunicationTrends />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

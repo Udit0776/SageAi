@@ -172,23 +172,63 @@ export default function CareerHealthWidget({ latestScore: initialScore, history:
 
         {/* Breakdown sub-scores (reformatted for horizontal space) */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center bg-white/[0.01] border border-white/5 rounded-xl p-2.5">
-          <div className="flex flex-col">
-            <span className="text-muted-foreground uppercase tracking-wider text-[8px]">Resume ATS</span>
+          <div className="flex flex-col items-center justify-center">
+            <span className="text-muted-foreground uppercase tracking-wider text-[8px] flex items-center gap-1 justify-center">
+              Resume ATS
+              {score?.resumeTrend === "improving" ? (
+                <span className="text-emerald-500 font-extrabold text-[10px]">↑</span>
+              ) : score?.resumeTrend === "declining" ? (
+                <span className="text-rose-500 font-extrabold text-[10px]">↓</span>
+              ) : (
+                <span className="text-zinc-500 font-extrabold text-[10px]">→</span>
+              )}
+            </span>
             <span className="text-xs font-black text-white mt-0.5">{score?.atsScoreWeight || 0}%</span>
+            
+            {/* Inline ATS Sparkline */}
+            {score?.atsScoreHistory && score.atsScoreHistory.length > 1 && (
+              <div className="h-4 w-12 mt-1">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={score.atsScoreHistory.map((val, i) => ({ val, i }))}>
+                    <Line 
+                      type="monotone" 
+                      dataKey="val" 
+                      stroke={score.resumeTrend === "improving" ? "#10b981" : score.resumeTrend === "declining" ? "#ef4444" : "#71717a"} 
+                      strokeWidth={1.5} 
+                      dot={false} 
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            )}
           </div>
-          <div className="flex flex-col border-l border-white/5">
+          <div className="flex flex-col border-l border-white/5 justify-center">
             <span className="text-muted-foreground uppercase tracking-wider text-[8px]">Interview Prep</span>
             <span className="text-xs font-black text-white mt-0.5">{score?.readinessWeight || 0}%</span>
           </div>
-          <div className="flex flex-col border-l border-white/5 sm:border-l">
+          <div className="flex flex-col border-l border-white/5 sm:border-l justify-center">
             <span className="text-muted-foreground uppercase tracking-wider text-[8px]">Skill Match</span>
             <span className="text-xs font-black text-white mt-0.5">{score?.skillGapWeight || 0}%</span>
           </div>
-          <div className="flex flex-col border-l border-white/5">
+          <div className="flex flex-col border-l border-white/5 justify-center">
             <span className="text-muted-foreground uppercase tracking-wider text-[8px]">Kanban Act.</span>
             <span className="text-xs font-black text-white mt-0.5">{score?.kanbanWeight || 0}%</span>
           </div>
         </div>
+
+        {/* ATS Trend insight */}
+        {score?.resumeTrendInsight && (
+          <p className="text-[10px] text-zinc-400 bg-white/[0.01] border border-white/5 rounded-xl p-2.5 text-left flex items-start gap-1.5 leading-relaxed font-medium">
+            {score.resumeTrend === "improving" ? (
+              <span className="text-emerald-500 shrink-0 font-extrabold text-[12px] leading-none">↑</span>
+            ) : score.resumeTrend === "declining" ? (
+              <span className="text-rose-500 shrink-0 font-extrabold text-[12px] leading-none">↓</span>
+            ) : (
+              <span className="text-zinc-500 shrink-0 font-extrabold text-[12px] leading-none">→</span>
+            )}
+            <span>{score.resumeTrendInsight}</span>
+          </p>
+        )}
 
         {/* AI Insight banner */}
         <div className="bg-primary/5 border border-primary/15 rounded-xl p-3 flex gap-2.5 items-start">

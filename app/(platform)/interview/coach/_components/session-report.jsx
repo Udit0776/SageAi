@@ -18,7 +18,7 @@ import { useState } from "react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/app/components/ui/accordion";
 import Link from "next/link";
 
-export default function SessionReport({ data, results, type, role }) {
+export default function SessionReport({ data, results, type, role, onBack }) {
   const [expanded, setExpanded] = useState(false);
 
   const radarData = [
@@ -55,12 +55,19 @@ export default function SessionReport({ data, results, type, role }) {
             <h1 className="text-xl sm:text-2xl font-bold gradient-title">Interview Analysis</h1>
             <p className="text-xs text-muted-foreground">Comprehensive feedback for your {type} session.</p>
          </div>
-         <Link href="/interview/coach">
-            <Button variant="outline" className="rounded-full px-6">
+         {onBack ? (
+            <Button variant="outline" className="rounded-full px-6" onClick={onBack}>
                Start New Session
                <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
-         </Link>
+         ) : (
+            <Link href="/interview/coach">
+               <Button variant="outline" className="rounded-full px-6">
+                  Start New Session
+                  <ArrowRight className="h-4 w-4 ml-2" />
+               </Button>
+            </Link>
+         )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -108,7 +115,7 @@ export default function SessionReport({ data, results, type, role }) {
             <CardContent className="h-[300px] sm:h-[400px] p-0">
                <ResponsiveContainer width="100%" height="100%">
                   <RadarChart cx="50%" cy="50%" outerRadius="80%" data={radarData}>
-                    <PolarGrid stroke="rgba(var(--primary), 0.1)" />
+                    <PolarGrid stroke="var(--primary)" strokeOpacity={0.2} />
                     <PolarAngleAxis dataKey="subject" tick={{ fill: 'currentColor', opacity: 0.5, fontSize: 12 }} />
                     <PolarRadiusAxis angle={30} domain={[0, 10]} axisLine={false} tick={false} />
                     <Radar
@@ -186,8 +193,8 @@ export default function SessionReport({ data, results, type, role }) {
          <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                {data.improvementPlan.split(/\d\./).filter(Boolean).map((step, i) => (
-                   <div className="bg-white/50 dark:bg-zinc-900/50 p-6 rounded-2xl border border-primary/10 relative group hover:border-primary/30 transition-colors shadow-sm">
-                     <div className="absolute -top-3 -left-3 h-8 w-8 rounded-full bg-black text-white flex items-center justify-center font-black text-sm shadow-xl ring-2 ring-white/50 border border-white/20">
+                   <div key={i} className="bg-white/50 dark:bg-zinc-900/50 p-6 rounded-2xl border border-primary/10 relative group hover:border-primary/30 transition-colors shadow-sm">
+                     <div className="absolute -top-1.5 -left-1.5 h-5 w-5 rounded-full bg-black text-white flex items-center justify-center font-bold text-[10px] shadow-md border border-white/20">
                         {i + 1}
                      </div>
                      <p className="text-xs font-medium leading-relaxed mt-2">{step.trim()}</p>

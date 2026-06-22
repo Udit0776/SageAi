@@ -79,21 +79,38 @@ export async function deleteJobApplication(id) {
   return { success: true };
 }
 
+import { computeApplicationScore } from "@/lib/application-scorer";
+
 export async function getJobApplications() {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
   const user = await db.user.findUnique({
     where: { clerkUserId: userId },
+    include: {
+      resume: true,
+      coverLetters: true
+    }
   });
 
   if (!user) throw new Error("User not found");
 
-  return await db.jobApplication.findMany({
+  const applications = await db.jobApplication.findMany({
     where: { userId: user.id },
     include: { onboardingPlan: true },
     orderBy: { updatedAt: "desc" },
   });
+
+  // Compute success probability score for each application
+  const scoredApplications = applications.map((app) => {
+    const scoreResult = computeApplicationScore(app, user.resume, user);
+    return {
+      ...JSON.parse(JSON.stringify(app)),
+      successProbability: scoreResult,
+    };
+  });
+
+  return scoredApplications;
 }
 
 export async function getAIJobAdvice(jobId) {

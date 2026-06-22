@@ -3,6 +3,7 @@
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { getAIResponse } from "@/lib/gemini";
+import { computeWeaknessProfile, buildAdaptivePromptContext } from "@/lib/quiz-adapter";
 
 export async function generateQuiz() {
   const { userId } = await auth();
@@ -14,6 +15,38 @@ export async function generateQuiz() {
 
   if (!user) throw new Error("User Not Found");
 
+  // Fetch the user's past Assessment records (last 10)
+  const assessments = await db.assessment.findMany({
+    where: { userId: user.id },
+    orderBy: { createdAt: "desc" },
+    take: 10,
+  });
+
+  const weaknessProfile = computeWeaknessProfile(assessments);
+
+  // Extract last 10 questions to avoid repeating
+  const last10Questions = [];
+  for (const assessment of assessments) {
+    if (assessment.questions) {
+      for (const q of assessment.questions) {
+        if (last10Questions.length < 10) {
+          last10Questions.push(q.question);
+        } else {
+          break;
+        }
+      }
+    }
+    if (last10Questions.length >= 10) break;
+  }
+
+  const adaptiveContext = buildAdaptivePromptContext(
+    weaknessProfile,
+    user.skills,
+    user.industry,
+    last10Questions,
+    assessments.length
+  );
+
   const prompt = `
     Generate 10 technical interview questions for a ${
       user.industry
@@ -21,7 +54,11 @@ export async function generateQuiz() {
       user.skills?.length ? ` with expertise in ${user.skills.join(", ")}` : ""
     }.
     
+    ${adaptiveContext ? `Adaptive parameters:\n${adaptiveContext}\n` : ""}
+    
     Each question should be multiple choice with 4 options.
+    For each question, also detect its topic/category from the list: ["javascript", "react", "system design", "algorithms", "databases", "css", "typescript", "nodejs", "python", "devops", "testing"]. Use "other" if none match.
+    Also specify the difficulty: "easy", "medium", or "hard".
     
     Return the response in this JSON format only, no additional text:
     {
@@ -30,7 +67,9 @@ export async function generateQuiz() {
           "question": "string",
           "options": ["string", "string", "string", "string"],
           "correctAnswer": "string",
-          "explanation": "string"
+          "explanation": "string",
+          "category": "string",
+          "difficulty": "string"
         }
       ]
     }
@@ -41,7 +80,11 @@ export async function generateQuiz() {
     const cleanedText = text.replace(/```(?:json)?\n?/g, "").trim();
     const quiz = JSON.parse(cleanedText);
 
-    return quiz.questions;
+    return {
+      questions: quiz.questions,
+      weaknessProfile,
+      isPersonalized: assessments.length >= 3
+    };
   } catch (error) {
     console.error("Error generating quiz:", error);
     throw new Error("Failed to generate quiz. Please try again later.");
@@ -64,6 +107,8 @@ export async function saveQuizResult(questions, answers, score) {
     userAnswer: answers[index],
     isCorrect: q.correctAnswer === answers[index],
     explanation: q.explanation,
+    category: q.category || "other",
+    difficulty: q.difficulty || "medium",
   }));
 
   const wrongAnswers = questionResults.filter((q) => !q.isCorrect);
@@ -125,7 +170,7 @@ export async function getAssessments() {
   try {
     const assessments = await db.assessment.findMany({
       where: { userId: user.id },
-      orderBy: { createdAt: "asc" },
+      orderBy: { createdAt: "desc" },
     });
     return assessments;
   } catch (error) {
