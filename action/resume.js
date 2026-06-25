@@ -10,6 +10,26 @@ import { computeSemanticSimilarity, extractSkills } from "@/lib/nlp";
 import { computeATSScore, getPlainTextFromResume } from "@/lib/ats-scorer";
 import { extractCanonicalSkills } from "@/lib/skill-taxonomy";
 
+function cleanGarbledText(text) {
+  if (typeof text !== "string") return text;
+  return text
+    .replace(/â€¢/g, "•")
+    .replace(/\u00e2\u20ac\u00a2/g, "•")
+    .replace(/â\x80\xa2/g, "•")
+    .replace(/â\x80\x93/g, "–")
+    .replace(/â\x80\x94/g, "—")
+    .replace(/â\x80\x99/g, "’")
+    .replace(/â\x80\x98/g, "‘")
+    .replace(/â\x80\x9c/g, "“")
+    .replace(/â\x80\x9d/g, "”")
+    .replace(/â€“/g, "–")
+    .replace(/â€”/g, "—")
+    .replace(/â€™/g, "’")
+    .replace(/â€˜/g, "‘")
+    .replace(/â€œ/g, "“")
+    .replace(/â€/g, "”");
+}
+
 export async function saveResume(content) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
@@ -19,11 +39,13 @@ export async function saveResume(content) {
   });
   if (!user) throw new Error("User not found");
 
+  const cleanedContent = cleanGarbledText(content);
+
   try {
     const resume = await db.resume.upsert({
       where: { userId: user.id },
-      update: { content },
-      create: { userId: user.id, content },
+      update: { content: cleanedContent },
+      create: { userId: user.id, content: cleanedContent },
     });
 
     try {
@@ -55,6 +77,8 @@ export async function getResume() {
     });
     if (!resume) return null;
 
+    const cleanedContent = cleanGarbledText(resume.content);
+
     const industryInsight = user.industry
       ? await db.industryInsight.findUnique({
           where: { industry: user.industry },
@@ -63,6 +87,7 @@ export async function getResume() {
 
     return {
       ...resume,
+      content: cleanedContent,
       user: {
         industry: user.industry,
         industryInsight,
@@ -102,7 +127,7 @@ export async function improveWithAI({ current, type }) {
   try {
     const text = await getAIResponse(prompt);
     const cleanedText = text.replace(/```(?:[a-z]+)?\n?|\n?```/gi, "").trim();
-    return cleanedText;
+    return cleanGarbledText(cleanedText);
   } catch (error) {
     console.error("Error improving with AI:", error);
     throw new Error(error.message || "Failed to improve content with AI");
@@ -119,7 +144,7 @@ export async function parsePDFResume(formData) {
   try {
     const pdf = await getDocumentProxy(new Uint8Array(buffer));
     const { text } = await extractText(pdf, { mergePages: true });
-    return { base64, text };
+    return { base64, text: cleanGarbledText(text) };
   } catch (error) {
     console.error("Unpdf extraction failed, falling back to multimodal:", error);
     return { base64, text: null };
@@ -128,11 +153,12 @@ export async function parsePDFResume(formData) {
 
 export async function extractResumeFromPDF(data) {
   const { base64, text: extractedText } = data;
+  const cleanedText = cleanGarbledText(extractedText);
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
   const prompt = `
-    You are an expert resume parser. I have provided a ${extractedText ? "text version" : "PDF"} of a resume.
+    You are an expert resume parser. I have provided a ${cleanedText ? "text version" : "PDF"} of a resume.
     Extract the following information and structure it into a JSON object:
     {
       "contactInfo": {
@@ -162,15 +188,28 @@ export async function extractResumeFromPDF(data) {
   `;
 
   try {
-    const aiResponse = extractedText 
-      ? await getAIResponse(`${prompt}\n\nResume Content:\n${extractedText}`)
+    const aiResponse = cleanedText 
+      ? await getAIResponse(`${prompt}\n\nResume Content:\n${cleanedText}`)
       : await getAIResponse(prompt, { pdfData: base64 });
 
     const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       throw new Error("AI response did not contain valid JSON");
     }
-    return JSON.parse(jsonMatch[0]);
+    const parsed = JSON.parse(jsonMatch[0]);
+    const cleanObject = (obj) => {
+      if (typeof obj === "string") return cleanGarbledText(obj);
+      if (Array.isArray(obj)) return obj.map(cleanObject);
+      if (obj !== null && typeof obj === "object") {
+        const res = {};
+        for (const k in obj) {
+          res[k] = cleanObject(obj[k]);
+        }
+        return res;
+      }
+      return obj;
+    };
+    return cleanObject(parsed);
   } catch (error) {
     console.error("Error extracting resume:", error);
     throw new Error(error.message || "Failed to extract resume from PDF");
@@ -267,13 +306,14 @@ export async function tailorResumeWithAI({ currentResume, jobDescription }) {
   if (!userId) throw new Error("Unauthorized");
 
   const resumeText = getPlainTextFromResume(currentResume);
-  const keywordResult = computeKeywordMatchScore(resumeText, jobDescription);
+  const cleanedJD = cleanGarbledText(jobDescription);
+  const keywordResult = computeKeywordMatchScore(resumeText, cleanedJD);
 
   // Invoke NLP microservice endpoints concurrently
   const [semanticResult, resumeSkillsResult, jdSkillsResult] = await Promise.all([
-    computeSemanticSimilarity(resumeText, jobDescription),
+    computeSemanticSimilarity(resumeText, cleanedJD),
     extractSkills(resumeText),
-    extractSkills(jobDescription)
+    extractSkills(cleanedJD)
   ]);
 
   const semanticScore = semanticResult ? semanticResult.score : null;
@@ -291,7 +331,7 @@ export async function tailorResumeWithAI({ currentResume, jobDescription }) {
     You are an expert ATS optimizer and career strategist. 
     
     Candidate Resume: """${currentResume}"""
-    Target Job Description: """${jobDescription}"""
+    Target Job Description: """${cleanedJD}"""
 
     We did some advanced pre-processing analyses:
     
@@ -330,6 +370,18 @@ export async function tailorResumeWithAI({ currentResume, jobDescription }) {
       throw new Error("AI response did not contain valid JSON");
     }
     const parsedResult = JSON.parse(jsonMatch[0]);
+    const cleanObject = (obj) => {
+      if (typeof obj === "string") return cleanGarbledText(obj);
+      if (Array.isArray(obj)) return obj.map(cleanObject);
+      if (obj !== null && typeof obj === "object") {
+        const res = {};
+        for (const k in obj) {
+          res[k] = cleanObject(obj[k]);
+        }
+        return res;
+      }
+      return obj;
+    };
     return {
       keywordMatchScore: keywordResult.matchScore,
       matchingKeywords: keywordResult.matchingKeywords,
@@ -341,8 +393,8 @@ export async function tailorResumeWithAI({ currentResume, jobDescription }) {
       requiredSkills: requiredSkills,
       presentSkills: presentSkills,
       skillGap: skillGap,
-      aiExplanation: parsedResult.aiExplanation,
-      tailoredResume: parsedResult.tailoredResume
+      aiExplanation: cleanGarbledText(parsedResult.aiExplanation),
+      tailoredResume: cleanObject(parsedResult.tailoredResume)
     };
   } catch (error) {
     console.error("Error tailoring resume:", error);
@@ -358,6 +410,8 @@ export async function parseMarkdownResume(markdownText) {
     where: { clerkUserId: userId },
   });
   if (!user) throw new Error("User not found");
+
+  const cleanedMarkdown = cleanGarbledText(markdownText);
 
   const prompt = `
     You are an expert resume parser. I have provided a Markdown version of a resume.
@@ -390,12 +444,25 @@ export async function parseMarkdownResume(markdownText) {
   `;
 
   try {
-    const aiResponse = await getAIResponse(`${prompt}\n\nResume Markdown:\n${markdownText}`);
+    const aiResponse = await getAIResponse(`${prompt}\n\nResume Markdown:\n${cleanedMarkdown}`);
     const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       throw new Error("AI response did not contain valid JSON");
     }
-    return JSON.parse(jsonMatch[0]);
+    const parsed = JSON.parse(jsonMatch[0]);
+    const cleanObject = (obj) => {
+      if (typeof obj === "string") return cleanGarbledText(obj);
+      if (Array.isArray(obj)) return obj.map(cleanObject);
+      if (obj !== null && typeof obj === "object") {
+        const res = {};
+        for (const k in obj) {
+          res[k] = cleanObject(obj[k]);
+        }
+        return res;
+      }
+      return obj;
+    };
+    return cleanObject(parsed);
   } catch (error) {
     console.error("Error parsing Markdown resume:", error);
     throw new Error("Failed to parse Markdown resume content");

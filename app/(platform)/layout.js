@@ -9,6 +9,7 @@ import {
   Building2, Brain, IndianRupee, Share2, ListTodo, Users, 
   Menu, X, GitCompare
 } from "lucide-react";
+import AIAssistantBubble from "@/app/components/ai-assistant-bubble";
 
 export default function PlatformLayout({ children }) {
   const pathname = usePathname();
@@ -71,6 +72,7 @@ export default function PlatformLayout({ children }) {
         <main className="flex-1 flex flex-col bg-background">
           {children}
         </main>
+        <AIAssistantBubble />
       </div>
     );
   }
@@ -313,7 +315,7 @@ export default function PlatformLayout({ children }) {
           {children}
         </main>
       </div>
-
+      <AIAssistantBubble />
     </div>
   );
 }

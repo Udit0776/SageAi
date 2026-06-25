@@ -1,10 +1,23 @@
 "use client";
 
 import { Badge } from "@/app/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/card";
 import {
-  Building2, Users, Globe, MessageSquare, CheckCircle2,
-  Newspaper, IndianRupee, ArrowRight, Lightbulb
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/app/components/ui/card";
+import {
+  Building2,
+  Users,
+  Globe,
+  MessageSquare,
+  CheckCircle2,
+  Newspaper,
+  IndianRupee,
+  ArrowRight,
+  Lightbulb,
+  Clock,
 } from "lucide-react";
 
 export default function BattlePlanView({ content, companyName }) {
@@ -12,10 +25,14 @@ export default function BattlePlanView({ content, companyName }) {
 
   const getToneColor = (category) => {
     switch (category) {
-      case "behavioral": return "bg-blue-500/10 text-blue-400 border-blue-500/20";
-      case "technical": return "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
-      case "culture": return "bg-violet-500/10 text-violet-400 border-violet-500/20";
-      default: return "bg-muted text-muted-foreground";
+      case "behavioral":
+        return "bg-blue-500/10 text-blue-400 border-blue-500/20";
+      case "technical":
+        return "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+      case "culture":
+        return "bg-violet-500/10 text-violet-400 border-violet-500/20";
+      default:
+        return "bg-muted text-muted-foreground";
     }
   };
 
@@ -38,21 +55,32 @@ export default function BattlePlanView({ content, companyName }) {
           {Array.isArray(content.companyOverview?.values) && (
             <div className="flex flex-wrap gap-2">
               {content.companyOverview.values.map((v, i) => (
-                <Badge key={i} variant="secondary" className="bg-primary/10 text-primary border-primary/20 text-[10px] sm:text-xs px-2 py-0">
+                <Badge
+                  key={i}
+                  variant="secondary"
+                  className="bg-primary/10 text-primary border-primary/20 text-[10px] sm:text-xs px-2 py-0"
+                >
                   {v}
                 </Badge>
               ))}
             </div>
           )}
           {content.companyOverview?.culture && (
-            <p className="text-[10px] sm:text-xs text-muted-foreground leading-relaxed">{content.companyOverview.culture}</p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground leading-relaxed">
+              {content.companyOverview.culture}
+            </p>
           )}
           <div className="flex flex-wrap gap-4 text-xs text-muted-foreground pt-2">
             {content.companyOverview?.size && (
-              <span className="flex items-center gap-1"><Users className="h-3 w-3" /> {content.companyOverview.size}</span>
+              <span className="flex items-center gap-1">
+                <Users className="h-3 w-3" /> {content.companyOverview.size}
+              </span>
             )}
             {content.companyOverview?.headquarters && (
-              <span className="flex items-center gap-1"><Globe className="h-3 w-3" /> {content.companyOverview.headquarters}</span>
+              <span className="flex items-center gap-1">
+                <Globe className="h-3 w-3" />{" "}
+                {content.companyOverview.headquarters}
+              </span>
             )}
           </div>
         </CardContent>
@@ -80,13 +108,21 @@ export default function BattlePlanView({ content, companyName }) {
             </div>
           )}
           {content.interviewProcess?.duration && (
-            <p className="text-xs text-muted-foreground">⏱️ Expected Duration: {content.interviewProcess.duration}</p>
+            <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+              <Clock className="h-4e w-4 shrink-0" />
+              Expected Duration: {content.interviewProcess.duration}
+            </p>
           )}
           {content.interviewProcess?.tips?.length > 0 && (
             <div className="space-y-2 pt-2 border-t border-border/50">
-              <div className="text-xs font-bold text-muted-foreground uppercase">Pro Tips</div>
+              <div className="text-xs font-bold text-muted-foreground uppercase">
+                Pro Tips
+              </div>
               {content.interviewProcess.tips.map((tip, i) => (
-                <div key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
+                <div
+                  key={i}
+                  className="flex items-start gap-2 text-xs text-muted-foreground"
+                >
                   <Lightbulb className="h-3 w-3 text-yellow-500 mt-0.5 shrink-0" />
                   {tip}
                 </div>
@@ -115,7 +151,9 @@ export default function BattlePlanView({ content, companyName }) {
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-muted-foreground">Upload your resume for personalized fit analysis.</p>
+            <p className="text-sm text-muted-foreground">
+              Upload your resume for personalized fit analysis.
+            </p>
           )}
         </CardContent>
       </Card>
@@ -129,13 +167,21 @@ export default function BattlePlanView({ content, companyName }) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {Array.isArray(content.commonQuestions) && content.commonQuestions.length > 0 ? (
+          {Array.isArray(content.commonQuestions) &&
+          content.commonQuestions.length > 0 ? (
             <div className="space-y-4">
               {content.commonQuestions.map((q, i) => (
-                <div key={i} className="p-4 rounded-xl bg-muted/20 border border-muted/50 space-y-2">
+                <div
+                  key={i}
+                  className="p-4 rounded-xl bg-muted/20 border border-muted/50 space-y-2"
+                >
                   <div className="flex items-start justify-between gap-2">
-                    <p className="text-xs sm:text-sm font-medium flex-1">{q?.question || "Interview Question"}</p>
-                    <Badge className={`text-[10px] shrink-0 ${getToneColor(q?.category)}`}>
+                    <p className="text-xs sm:text-sm font-medium flex-1">
+                      {q?.question || "Interview Question"}
+                    </p>
+                    <Badge
+                      className={`text-[10px] shrink-0 ${getToneColor(q?.category)}`}
+                    >
                       {q?.category || "general"}
                     </Badge>
                   </div>
@@ -166,12 +212,16 @@ export default function BattlePlanView({ content, companyName }) {
               {content.recentNews.map((news, i) => (
                 <div key={i} className="space-y-1">
                   <p className="text-sm font-medium">{news.title}</p>
-                  <p className="text-xs text-muted-foreground">{news.summary}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {news.summary}
+                  </p>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground">No recent news found.</p>
+            <p className="text-sm text-muted-foreground">
+              No recent news found.
+            </p>
           )}
         </CardContent>
       </Card>
@@ -184,22 +234,23 @@ export default function BattlePlanView({ content, companyName }) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {content.salaryRange && typeof content.salaryRange === 'object' ? (
+          {content.salaryRange && typeof content.salaryRange === "object" ? (
             <div className="space-y-3">
               <div className="flex items-end gap-2">
                 <span className="text-2xl font-bold">
-                  {content.salaryRange.currency === "INR" 
-                    ? `₹${((Number(content.salaryRange.min) || 0) / 100000).toFixed(1)}L` 
+                  {content.salaryRange.currency === "INR"
+                    ? `₹${((Number(content.salaryRange.min) || 0) / 100000).toFixed(1)}L`
                     : `$${((Number(content.salaryRange.min) || 0) / 1000).toFixed(0)}K`}
                 </span>
                 <span className="text-muted-foreground pb-0.5">—</span>
                 <span className="text-2xl font-bold text-primary">
-                  {content.salaryRange.currency === "INR" 
-                    ? `₹${((Number(content.salaryRange.max) || 0) / 100000).toFixed(1)}L` 
+                  {content.salaryRange.currency === "INR"
+                    ? `₹${((Number(content.salaryRange.max) || 0) / 100000).toFixed(1)}L`
                     : `$${((Number(content.salaryRange.max) || 0) / 1000).toFixed(0)}K`}
                 </span>
                 <span className="text-xs text-muted-foreground pb-1">
-                  {content.salaryRange.currency || "INR"}/{content.salaryRange.format || "LPA"}
+                  {content.salaryRange.currency || "INR"}/
+                  {content.salaryRange.format || "LPA"}
                 </span>
               </div>
               <div className="h-2 bg-muted rounded-full overflow-hidden">
@@ -210,7 +261,9 @@ export default function BattlePlanView({ content, companyName }) {
               </div>
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground">Salary data not available.</p>
+            <p className="text-sm text-muted-foreground">
+              Salary data not available.
+            </p>
           )}
         </CardContent>
       </Card>

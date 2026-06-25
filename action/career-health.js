@@ -76,13 +76,13 @@ export async function calculateBaselineHealthScore(clerkUserId) {
 
   // 3. Skill Gap Coverage Weight (25%)
   let skillGapScore = 0;
-  if (user.industryInsight && user.industryInsight.recommendedSkills?.length > 0) {
+  if (user.skillGapReports && user.skillGapReports.length > 0) {
+    skillGapScore = user.skillGapReports[0].readinessScore || 50;
+  } else if (user.industryInsight && user.industryInsight.recommendedSkills?.length > 0) {
     const recommended = user.industryInsight.recommendedSkills;
     const userSkillsSet = new Set(user.skills.map(s => s.toLowerCase().trim()));
     const matching = recommended.filter(s => userSkillsSet.has(s.toLowerCase().trim())).length;
     skillGapScore = (matching / recommended.length) * 100;
-  } else if (user.skillGapReports && user.skillGapReports.length > 0) {
-    skillGapScore = user.skillGapReports[0].readinessScore || 50;
   } else {
     skillGapScore = user.skills.length > 0 ? Math.min(user.skills.length * 10, 100) : 0;
   }
@@ -161,13 +161,13 @@ export async function calculateCareerHealthScore(explicitClerkUserId = null) {
 
   // 3. Skill Gap Coverage Weight (25%)
   let skillGapScore = 0;
-  if (user.industryInsight && user.industryInsight.recommendedSkills?.length > 0) {
+  if (user.skillGapReports && user.skillGapReports.length > 0) {
+    skillGapScore = user.skillGapReports[0].readinessScore || 50;
+  } else if (user.industryInsight && user.industryInsight.recommendedSkills?.length > 0) {
     const recommended = user.industryInsight.recommendedSkills;
     const userSkillsSet = new Set(user.skills.map(s => s.toLowerCase().trim()));
     const matching = recommended.filter(s => userSkillsSet.has(s.toLowerCase().trim())).length;
     skillGapScore = (matching / recommended.length) * 100;
-  } else if (user.skillGapReports && user.skillGapReports.length > 0) {
-    skillGapScore = user.skillGapReports[0].readinessScore || 50;
   } else {
     skillGapScore = user.skills.length > 0 ? Math.min(user.skills.length * 10, 100) : 0;
   }
@@ -339,11 +339,13 @@ export async function getLatestCareerHealthScore() {
     latestSkillGapTime > latestScoreTime;
 
   if (isOutdated) {
-    console.log("[CareerHealth] Cached score is outdated. Dispatching background Inngest event for recalculation...");
-    inngest.send({
-      name: "app/career-health.recalculate",
-      data: { userId }
-    }).catch(err => console.error("Failed to send Inngest event for career health:", err));
+    console.log("[CareerHealth] Cached score is outdated. Recalculating synchronously...");
+    try {
+      const freshScore = await calculateCareerHealthScore(userId);
+      return freshScore;
+    } catch (err) {
+      console.error("Failed to recalculate career health score synchronously:", err);
+    }
   }
 
   return await appendTrendMetrics(user.id, latest);

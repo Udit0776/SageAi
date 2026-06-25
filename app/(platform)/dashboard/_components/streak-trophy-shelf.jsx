@@ -110,7 +110,7 @@ export default function StreakTrophyShelf({ streak }) {
                     ? `bg-gradient-to-br ${badge.color} border-white/10 shadow-[0_0_15px_rgba(99,102,241,0.05)] scale-100 hover:scale-105` 
                     : 'bg-[#18181b]/30 border-white/5 text-zinc-500 scale-95 opacity-55'
                 }`}>
-                  <BadgeIcon className={`h-5 w-5 ${isEarned ? 'text-inherit' : 'text-zinc-500'}`} />
+                  <BadgeIcon className={`h-5 w-5 ${isEarned ? 'text-white' : 'text-zinc-500'}`} />
                   
                   {/* Status overlays */}
                   {isEarned ? (

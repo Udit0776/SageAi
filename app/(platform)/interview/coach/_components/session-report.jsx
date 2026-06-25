@@ -21,6 +21,19 @@ import Link from "next/link";
 export default function SessionReport({ data, results, type, role, onBack }) {
   const [expanded, setExpanded] = useState(false);
 
+  // Guard: if data or results are missing, show a fallback
+  if (!data || !results || !Array.isArray(results) || results.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 space-y-4">
+        <AlertCircle className="h-12 w-12 text-muted-foreground/50" />
+        <p className="text-muted-foreground text-sm">Session data is unavailable or incomplete.</p>
+        {onBack && (
+          <Button variant="outline" onClick={onBack}>Go Back</Button>
+        )}
+      </div>
+    );
+  }
+
   const radarData = [
     { subject: "Clarity", A: 0, fullMark: 10 },
     { subject: "Relevance", A: 0, fullMark: 10 },
@@ -29,14 +42,16 @@ export default function SessionReport({ data, results, type, role, onBack }) {
     { subject: "Structure", A: 0, fullMark: 10 },
   ];
 
-  // Calculate averages for radar chart
+  // Calculate averages for radar chart (null-safe)
   results.forEach(r => {
-    radarData[0].A += r.scores.clarity;
-    radarData[1].A += r.scores.relevance;
-    radarData[2].A += r.scores.depth;
-    radarData[3].A += r.scores.confidence;
+    const scores = r.scores || {};
+    radarData[0].A += scores.clarity || 0;
+    radarData[1].A += scores.relevance || 0;
+    radarData[2].A += scores.depth || 0;
+    radarData[3].A += scores.confidence || 0;
     // Estimate structure based on STAR score
-    const starCount = Object.values(r.starAnalysis).filter(Boolean).length;
+    const starAnalysis = r.starAnalysis || {};
+    const starCount = Object.values(starAnalysis).filter(Boolean).length;
     radarData[4].A += (starCount / 4) * 10;
   });
 
@@ -83,21 +98,21 @@ export default function SessionReport({ data, results, type, role, onBack }) {
                     cx="96" cy="96" r="88"
                     fill="none" stroke="currentColor" strokeWidth="12"
                     strokeDasharray={552}
-                    strokeDashoffset={552 - (552 * data.readinessScore) / 100}
+                    strokeDashoffset={552 - (552 * (data.readinessScore || 0)) / 100}
                     strokeLinecap="round"
-                    className={`${getReadinessColor(data.readinessScore)} transition-all duration-1000 ease-out`}
+                    className={`${getReadinessColor(data.readinessScore || 0)} transition-all duration-1000 ease-out`}
                   />
                </svg>
                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className={`text-2xl sm:text-3xl font-black ${getReadinessColor(data.readinessScore)}`}>
-                    {data.readinessScore}%
+                  <span className={`text-2xl sm:text-3xl font-black ${getReadinessColor(data.readinessScore || 0)}`}>
+                    {data.readinessScore || 0}%
                   </span>
                   <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground mt-1">Readiness</span>
                </div>
             </div>
             <div className="mt-8 space-y-2">
                <h3 className="text-lg font-bold">
-                 {data.readinessScore >= 80 ? "Interview Ready!" : data.readinessScore >= 60 ? "Almost There" : "Needs More Practice"}
+                 {(data.readinessScore || 0) >= 80 ? "Interview Ready!" : (data.readinessScore || 0) >= 60 ? "Almost There" : "Needs More Practice"}
                </h3>
                <p className="text-sm text-muted-foreground max-w-[200px]">
                  Based on your {results.length} answers, here's how you compare to industry benchmarks.
@@ -139,7 +154,7 @@ export default function SessionReport({ data, results, type, role, onBack }) {
             </CardHeader>
             <CardContent>
                <ul className="space-y-2">
-                  {data.strengths.map((s, i) => (
+                  {(data.strengths || []).map((s, i) => (
                     <li key={i} className="flex items-start gap-3 text-xs">
                        <CheckCircle2 className="h-3.5 w-3.5 text-green-500 mt-0.5 shrink-0" />
                        <span className="font-medium text-foreground/80">{s}</span>
@@ -156,7 +171,7 @@ export default function SessionReport({ data, results, type, role, onBack }) {
             </CardHeader>
             <CardContent>
                <ul className="space-y-2">
-                  {data.weaknesses.map((w, i) => (
+                  {(data.weaknesses || []).map((w, i) => (
                     <li key={i} className="flex items-start gap-3 text-xs">
                        <AlertCircle className="h-3.5 w-3.5 text-red-500 mt-0.5 shrink-0" />
                        <span className="font-medium text-foreground/80">{w}</span>
@@ -179,7 +194,7 @@ export default function SessionReport({ data, results, type, role, onBack }) {
             <CardDescription className="text-red-500/70">A brutally honest look at why a recruiter might say "no".</CardDescription>
          </CardHeader>
          <CardContent>
-            <p className="text-sm font-medium leading-relaxed italic">"{data.rejectionRisk}"</p>
+            <p className="text-sm font-medium leading-relaxed italic">"{data.rejectionRisk || 'No rejection risk data available.'}"</p>
          </CardContent>
       </Card>
 
@@ -192,7 +207,7 @@ export default function SessionReport({ data, results, type, role, onBack }) {
          </CardHeader>
          <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-               {data.improvementPlan.split(/\d\./).filter(Boolean).map((step, i) => (
+               {(data.improvementPlan || '').split(/\d\./).filter(Boolean).map((step, i) => (
                    <div key={i} className="bg-white/50 dark:bg-zinc-900/50 p-6 rounded-2xl border border-primary/10 relative group hover:border-primary/30 transition-colors shadow-sm">
                      <div className="absolute -top-1.5 -left-1.5 h-5 w-5 rounded-full bg-black text-white flex items-center justify-center font-bold text-[10px] shadow-md border border-white/20">
                         {i + 1}
@@ -216,10 +231,10 @@ export default function SessionReport({ data, results, type, role, onBack }) {
                <AccordionItem key={i} value={`item-${i}`} className="border rounded-2xl px-6 bg-card/50 overflow-hidden">
                    <AccordionTrigger className="hover:no-underline py-6">
                      <div className="flex items-center gap-4 text-left">
-                        <div className={`h-10 w-10 shrink-0 rounded-full flex items-center justify-center font-black text-white shadow-lg ${r.overallScore >= 8 ? 'bg-green-500' : r.overallScore >= 6 ? 'bg-yellow-500' : 'bg-red-500'}`}>
-                           {r.overallScore}
+                        <div className={`h-10 w-10 shrink-0 rounded-full flex items-center justify-center font-black text-white shadow-lg ${(r.overallScore || 0) >= 8 ? 'bg-green-500' : (r.overallScore || 0) >= 6 ? 'bg-yellow-500' : 'bg-red-500'}`}>
+                           {r.overallScore || 0}
                         </div>
-                        <div className="font-bold line-clamp-1">{r.question}</div>
+                        <div className="font-bold line-clamp-1">{r.question || 'Question'}</div>
                      </div>
                   </AccordionTrigger>
                   <AccordionContent className="pb-8 space-y-6">
@@ -227,11 +242,11 @@ export default function SessionReport({ data, results, type, role, onBack }) {
                         <div className="space-y-4">
                            <div className="space-y-1">
                               <Label className="text-[10px] uppercase font-bold text-muted-foreground">Your Answer</Label>
-                              <p className="text-xs leading-relaxed text-foreground/80">{r.userAnswer}</p>
+                              <p className="text-xs leading-relaxed text-foreground/80">{r.userAnswer || 'No answer recorded.'}</p>
                            </div>
                            <div className="space-y-1">
                               <Label className="text-[10px] uppercase font-bold text-primary">Coach's Feedback</Label>
-                              <p className="text-xs leading-relaxed text-primary/80 italic">{r.feedback}</p>
+                              <p className="text-xs leading-relaxed text-primary/80 italic">{r.feedback || 'No feedback available.'}</p>
                            </div>
                         </div>
                         <div className="bg-primary/5 rounded-2xl p-6 space-y-4 border border-primary/10">
@@ -239,13 +254,13 @@ export default function SessionReport({ data, results, type, role, onBack }) {
                               <Award className="h-4 w-4" />
                               Stronger Version
                            </div>
-                           <p className="text-xs leading-relaxed">{r.improvedAnswer}</p>
+                           <p className="text-xs leading-relaxed">{r.improvedAnswer || 'No improved answer available.'}</p>
                            <div className="pt-4 border-t border-primary/10">
                               <Label className="text-[10px] uppercase font-bold text-muted-foreground block mb-2">STAR Check</Label>
                               <div className="flex gap-2">
                                  {['Situation', 'Task', 'Action', 'Result'].map(key => (
-                                    <Badge key={key} variant={r.starAnalysis[key.toLowerCase()] ? "default" : "outline"} className="text-[10px]">
-                                       {r.starAnalysis[key.toLowerCase()] ? "✅" : "❌"} {key}
+                                    <Badge key={key} variant={(r.starAnalysis || {})[key.toLowerCase()] ? "default" : "outline"} className="text-[10px]">
+                                       {(r.starAnalysis || {})[key.toLowerCase()] ? "✅" : "❌"} {key}
                                     </Badge>
                                  ))}
                               </div>
