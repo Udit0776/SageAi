@@ -90,7 +90,7 @@ export default function ApplicationFunnel({ applications }) {
                   >
                     <LabelList 
                       position="right" 
-                      fill="#a1a1aa" 
+                      fill="var(--muted-foreground)" 
                       stroke="none" 
                       dataKey="name" 
                       fontSize={10} 
@@ -98,7 +98,7 @@ export default function ApplicationFunnel({ applications }) {
                     />
                     <LabelList 
                       position="inside" 
-                      fill="#fff" 
+                      fill="var(--primary-foreground)" 
                       stroke="none" 
                       dataKey="value" 
                       fontSize={11} 
@@ -110,21 +110,21 @@ export default function ApplicationFunnel({ applications }) {
             </div>
 
             {/* Funnel Metrics Bar */}
-            <div className="grid grid-cols-3 gap-2 text-center text-[10px] bg-white/[0.01] border border-white/5 rounded-xl p-2.5">
+            <div className="grid grid-cols-3 gap-2 text-center text-[10px] bg-muted/30 border border-border rounded-xl p-2.5">
               <div className="flex flex-col">
                 <span className="text-muted-foreground uppercase tracking-wider text-[8px]">Applied</span>
-                <span className="text-sm font-black text-blue-400 mt-0.5">{appliedCount}</span>
+                <span className="text-sm font-black text-blue-500 mt-0.5">{appliedCount}</span>
               </div>
-              <div className="flex flex-col border-x border-white/5">
+              <div className="flex flex-col border-x border-border">
                 <span className="text-muted-foreground uppercase tracking-wider text-[8px]">Interviewing</span>
                 <span className="text-sm font-black text-yellow-500 mt-0.5">
-                  {interviewingCount} <span className="text-[9px] font-bold text-zinc-550">({totalApps > 0 ? ((interviewingCount / totalApps) * 100).toFixed(0) : 0}%)</span>
+                  {interviewingCount} <span className="text-[9px] font-bold text-muted-foreground/80">({totalApps > 0 ? ((interviewingCount / totalApps) * 100).toFixed(0) : 0}%)</span>
                 </span>
               </div>
               <div className="flex flex-col">
                 <span className="text-muted-foreground uppercase tracking-wider text-[8px]">Offered</span>
                 <span className="text-sm font-black text-green-500 mt-0.5">
-                  {offeredCount} <span className="text-[9px] font-bold text-zinc-550">({totalApps > 0 ? ((offeredCount / totalApps) * 100).toFixed(0) : 0}%)</span>
+                  {offeredCount} <span className="text-[9px] font-bold text-muted-foreground/80">({totalApps > 0 ? ((offeredCount / totalApps) * 100).toFixed(0) : 0}%)</span>
                 </span>
               </div>
             </div>
@@ -137,10 +137,10 @@ export default function ApplicationFunnel({ applications }) {
                 <Sparkles className="h-4 w-4 text-primary shrink-0 mt-0.5" />
               )}
               <div className="space-y-0.5">
-                <h4 className="text-[10px] font-black tracking-tight text-white uppercase">
+                <h4 className="text-[10px] font-black tracking-tight text-foreground uppercase">
                   Funnel Leak Analysis
                 </h4>
-                <p className="text-[10px] text-zinc-350 leading-relaxed font-medium">
+                <p className="text-[10px] text-muted-foreground leading-relaxed font-medium">
                   {isLoadingCommentary ? "Analyzing drop-off leak points..." : commentary}
                 </p>
               </div>

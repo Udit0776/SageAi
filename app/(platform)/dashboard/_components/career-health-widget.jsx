@@ -109,18 +109,18 @@ export default function CareerHealthWidget({ latestScore: initialScore, history:
           {activeTab === 'radar' ? (
             <ResponsiveContainer width="100%" height="100%">
               <RadarChart cx="50%" cy="50%" outerRadius="55%" data={radarData} margin={{ top: 10, right: 30, bottom: 10, left: 30 }}>
-                <PolarGrid stroke="#27272a" />
+                <PolarGrid stroke="var(--border)" />
                 <PolarAngleAxis 
                   dataKey="subject" 
                   fontSize={8} 
-                  tick={{ fill: "#a1a1aa", fontWeight: 650 }} 
+                  tick={{ fill: "var(--muted-foreground)", fontWeight: 650 }} 
                 />
                 <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
                 <Radar
                   name="Health Score"
                   dataKey="value"
-                  stroke="#6366f1"
-                  fill="#6366f1"
+                  stroke="var(--primary)"
+                  fill="var(--primary)"
                   fillOpacity={0.25}
                 />
               </RadarChart>
@@ -129,12 +129,13 @@ export default function CareerHealthWidget({ latestScore: initialScore, history:
             <ResponsiveContainer width="100%" height="100%">
               {trendData.length > 1 ? (
                 <LineChart data={trendData} margin={{ top: 10, right: 10, left: -20, bottom: 5 }}>
-                  <XAxis dataKey="date" fontSize={8} tick={{ fill: "#71717a" }} stroke="#27272a" />
-                  <YAxis domain={[0, 100]} fontSize={8} tick={{ fill: "#71717a" }} stroke="#27272a" />
+                  <XAxis dataKey="date" fontSize={8} tick={{ fill: "var(--muted-foreground)" }} stroke="var(--border)" />
+                  <YAxis domain={[0, 100]} fontSize={8} tick={{ fill: "var(--muted-foreground)" }} stroke="var(--border)" />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: '#09090b',
-                      borderColor: '#1f1f23',
+                      backgroundColor: 'var(--popover)',
+                      borderColor: 'var(--border)',
+                      color: 'var(--popover-foreground)',
                       fontSize: '10px',
                       borderRadius: '8px',
                     }}
@@ -142,9 +143,9 @@ export default function CareerHealthWidget({ latestScore: initialScore, history:
                   <Line 
                     type="monotone" 
                     dataKey="score" 
-                    stroke="#8b5cf6" 
+                    stroke="var(--primary)" 
                     strokeWidth={2} 
-                    dot={{ fill: '#8b5cf6', r: 3 }} 
+                    dot={{ fill: 'var(--primary)', r: 3 }} 
                     activeDot={{ r: 5 }} 
                   />
                 </LineChart>
@@ -160,7 +161,7 @@ export default function CareerHealthWidget({ latestScore: initialScore, history:
           {/* Central score indicator on radar chart */}
           {activeTab === 'radar' && (
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none mt-2">
-              <span className="text-3xl font-black text-white leading-none tracking-tighter">
+              <span className="text-3xl font-black text-foreground leading-none tracking-tighter">
                 {score?.score || 0}
               </span>
               <span className="text-[8px] text-muted-foreground uppercase tracking-widest font-mono">
@@ -171,7 +172,7 @@ export default function CareerHealthWidget({ latestScore: initialScore, history:
         </div>
 
         {/* Breakdown sub-scores (reformatted for horizontal space) */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center bg-white/[0.01] border border-white/5 rounded-xl p-2.5">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center bg-muted/30 border border-border rounded-xl p-2.5">
           <div className="flex flex-col items-center justify-center">
             <span className="text-muted-foreground uppercase tracking-wider text-[8px] flex items-center gap-1 justify-center">
               Resume ATS
@@ -183,7 +184,7 @@ export default function CareerHealthWidget({ latestScore: initialScore, history:
                 <span className="text-zinc-500 font-extrabold text-[10px]">→</span>
               )}
             </span>
-            <span className="text-xs font-black text-white mt-0.5">{score?.atsScoreWeight || 0}%</span>
+            <span className="text-xs font-black text-foreground mt-0.5">{score?.atsScoreWeight || 0}%</span>
             
             {/* Inline ATS Sparkline */}
             {score?.atsScoreHistory && score.atsScoreHistory.length > 1 && (
@@ -202,23 +203,23 @@ export default function CareerHealthWidget({ latestScore: initialScore, history:
               </div>
             )}
           </div>
-          <div className="flex flex-col border-l border-white/5 justify-center">
+          <div className="flex flex-col border-l border-border justify-center">
             <span className="text-muted-foreground uppercase tracking-wider text-[8px]">Interview Prep</span>
-            <span className="text-xs font-black text-white mt-0.5">{score?.readinessWeight || 0}%</span>
+            <span className="text-xs font-black text-foreground mt-0.5">{score?.readinessWeight || 0}%</span>
           </div>
-          <div className="flex flex-col border-l border-white/5 sm:border-l justify-center">
+          <div className="flex flex-col border-l border-border justify-center">
             <span className="text-muted-foreground uppercase tracking-wider text-[8px]">Skill Match</span>
-            <span className="text-xs font-black text-white mt-0.5">{score?.skillGapWeight || 0}%</span>
+            <span className="text-xs font-black text-foreground mt-0.5">{score?.skillGapWeight || 0}%</span>
           </div>
-          <div className="flex flex-col border-l border-white/5 justify-center">
+          <div className="flex flex-col border-l border-border justify-center">
             <span className="text-muted-foreground uppercase tracking-wider text-[8px]">Kanban Act.</span>
-            <span className="text-xs font-black text-white mt-0.5">{score?.kanbanWeight || 0}%</span>
+            <span className="text-xs font-black text-foreground mt-0.5">{score?.kanbanWeight || 0}%</span>
           </div>
         </div>
 
         {/* ATS Trend insight */}
         {score?.resumeTrendInsight && (
-          <p className="text-[10px] text-zinc-400 bg-white/[0.01] border border-white/5 rounded-xl p-2.5 text-left flex items-start gap-1.5 leading-relaxed font-medium">
+          <p className="text-[10px] text-muted-foreground bg-muted/30 border border-border rounded-xl p-2.5 text-left flex items-start gap-1.5 leading-relaxed font-medium">
             {score.resumeTrend === "improving" ? (
               <span className="text-emerald-500 shrink-0 font-extrabold text-[12px] leading-none">↑</span>
             ) : score.resumeTrend === "declining" ? (
@@ -234,13 +235,13 @@ export default function CareerHealthWidget({ latestScore: initialScore, history:
         <div className="bg-primary/5 border border-primary/15 rounded-xl p-3 flex gap-2.5 items-start">
           <Sparkles className="h-4 w-4 text-primary shrink-0 mt-0.5 animate-pulse" />
           <div className="space-y-0.5">
-            <h4 className="text-[10px] font-black tracking-tight text-white uppercase flex items-center gap-1.5">
+            <h4 className="text-[10px] font-black tracking-tight text-foreground uppercase flex items-center gap-1.5">
               Sage AI Commentary
               <Badge variant="outline" className={`text-[8px] px-1 py-0 h-3.5 uppercase ${getScoreColor(score?.score)}`}>
                 {score?.score >= 80 ? 'EXCELLENT' : score?.score >= 50 ? 'GOOD' : 'CRITICAL'}
               </Badge>
             </h4>
-            <p className="text-[10px] text-zinc-350 leading-relaxed font-medium">
+            <p className="text-[10px] text-muted-foreground leading-relaxed font-medium">
               {score?.commentary || "Build your profile, upload a resume, or complete mock interviews to generate insights."}
             </p>
           </div>

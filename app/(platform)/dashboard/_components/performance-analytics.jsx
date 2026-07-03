@@ -168,16 +168,22 @@ const PerformanceAnalytics = ({ sessions }) => {
               <div className="h-48 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
-                    <XAxis dataKey="name" tick={{fill: '#888', fontSize: 10}} axisLine={false} tickLine={false} />
-                    <YAxis tick={{fill: '#888', fontSize: 10}} axisLine={false} tickLine={false} domain={[0, 100]} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+                    <XAxis dataKey="name" tick={{fill: 'var(--muted-foreground)', fontSize: 10}} axisLine={false} tickLine={false} />
+                    <YAxis tick={{fill: 'var(--muted-foreground)', fontSize: 10}} axisLine={false} tickLine={false} domain={[0, 100]} />
                     <Tooltip 
-                      cursor={{fill: 'rgba(255,255,255,0.05)'}}
-                      contentStyle={{backgroundColor: '#000', borderColor: '#333', borderRadius: '8px', fontSize: '12px'}}
+                      cursor={{fill: 'var(--border)'}}
+                      contentStyle={{
+                        backgroundColor: 'var(--popover)',
+                        borderColor: 'var(--border)',
+                        color: 'var(--popover-foreground)',
+                        borderRadius: '8px',
+                        fontSize: '12px'
+                      }}
                     />
                     <Legend wrapperStyle={{fontSize: '10px'}} />
-                    <Bar dataKey="score" name="Your Score" fill="#3b82f6" radius={[4, 4, 0, 0]} maxBarSize={40} />
-                    <Bar dataKey="industryAverage" name="Industry Avg" fill="#10b981" fillOpacity={0.5} radius={[4, 4, 0, 0]} maxBarSize={40} />
+                    <Bar dataKey="score" name="Your Score" fill="var(--primary)" radius={[4, 4, 0, 0]} maxBarSize={40} />
+                    <Bar dataKey="industryAverage" name="Industry Avg" fill="var(--secondary)" fillOpacity={0.5} radius={[4, 4, 0, 0]} maxBarSize={40} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>

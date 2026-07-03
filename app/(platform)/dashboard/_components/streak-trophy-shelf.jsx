@@ -69,18 +69,18 @@ export default function StreakTrophyShelf({ streak }) {
         </div>
         
         {/* Streak Indicator */}
-        <div className="flex items-center gap-3 bg-white/[0.02] border border-white/5 px-3 py-1 rounded-xl">
+        <div className="flex items-center gap-3 bg-muted/30 border border-border px-3 py-1 rounded-xl">
           <div className="flex items-center gap-1">
-            <Flame className={`h-4.5 w-4.5 ${currentStreak > 0 ? 'text-orange-500 fill-orange-500/20' : 'text-zinc-650'}`} />
+            <Flame className={`h-4.5 w-4.5 ${currentStreak > 0 ? 'text-orange-500 fill-orange-500/20' : 'text-muted-foreground/45'}`} />
             <div className="flex flex-col">
-              <span className="text-[10px] font-bold text-white leading-none">{currentStreak} Days</span>
-              <span className="text-[7px] text-zinc-400 uppercase tracking-wider">Current Streak</span>
+              <span className="text-[10px] font-bold text-foreground leading-none">{currentStreak} Days</span>
+              <span className="text-[7px] text-muted-foreground uppercase tracking-wider">Current Streak</span>
             </div>
           </div>
-          <div className="h-5 w-px bg-white/5" />
+          <div className="h-5 w-px bg-border" />
           <div className="flex flex-col">
-            <span className="text-[10px] font-bold text-white leading-none">{longestStreak} Days</span>
-            <span className="text-[7px] text-zinc-400 uppercase tracking-wider">Record Streak</span>
+            <span className="text-[10px] font-bold text-foreground leading-none">{longestStreak} Days</span>
+            <span className="text-[7px] text-muted-foreground uppercase tracking-wider">Record Streak</span>
           </div>
         </div>
       </CardHeader>
@@ -108,39 +108,39 @@ export default function StreakTrophyShelf({ streak }) {
                 <div className={`h-11 w-11 rounded-full flex items-center justify-center border relative transition-all duration-300 ${
                   isEarned 
                     ? `bg-gradient-to-br ${badge.color} border-white/10 shadow-[0_0_15px_rgba(99,102,241,0.05)] scale-100 hover:scale-105` 
-                    : 'bg-[#18181b]/30 border-white/5 text-zinc-500 scale-95 opacity-55'
+                    : 'bg-muted/50 border-border/50 text-muted-foreground/50 scale-95 opacity-55'
                 }`}>
-                  <BadgeIcon className={`h-5 w-5 ${isEarned ? 'text-white' : 'text-zinc-500'}`} />
+                  <BadgeIcon className={`h-5 w-5 ${isEarned ? 'text-primary-foreground' : 'text-muted-foreground/60'}`} />
                   
                   {/* Status overlays */}
                   {isEarned ? (
-                    <div className="absolute -bottom-0.5 -right-0.5 bg-emerald-500 rounded-full p-0.5 border border-black shadow">
+                    <div className="absolute -bottom-0.5 -right-0.5 bg-emerald-500 rounded-full p-0.5 border border-background shadow">
                       <CheckCircle2 className="h-2 w-2 text-white" />
                     </div>
                   ) : (
-                    <div className="absolute -bottom-0.5 -right-0.5 bg-[#18181b] border border-white/5 rounded-full p-0.5 shadow">
-                      <Lock className="h-2 w-2 text-zinc-500" />
+                    <div className="absolute -bottom-0.5 -right-0.5 bg-muted border border-border rounded-full p-0.5 shadow">
+                      <Lock className="h-2 w-2 text-muted-foreground/60" />
                     </div>
                   )}
                 </div>
                 
-                <span className="text-[9px] font-bold text-zinc-400 group-hover:text-white transition-colors truncate w-full mt-2">
+                <span className="text-[9px] font-bold text-muted-foreground group-hover:text-foreground transition-colors truncate w-full mt-2">
                   {badge.name}
                 </span>
-
+ 
                 {/* CSS/Tailwind Hover Tooltip Overlay */}
-                <div className={`absolute bottom-full mb-2.5 ${tooltipAlignClass} w-48 p-2.5 rounded-xl bg-[#09090b] border border-white/10 text-[10px] text-zinc-350 font-medium opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 z-50 shadow-2xl flex flex-col gap-1 text-left`}>
-                  <p className="font-bold text-white flex items-center gap-1.5 uppercase text-[8px] tracking-wider">
+                <div className={`absolute bottom-full mb-2.5 ${tooltipAlignClass} w-48 p-2.5 rounded-xl bg-popover border border-border text-[10px] text-popover-foreground font-medium opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 z-50 shadow-2xl flex flex-col gap-1 text-left`}>
+                  <p className="font-bold text-foreground flex items-center gap-1.5 uppercase text-[8px] tracking-wider">
                     {badge.name}
                     <span className={`text-[7px] font-bold px-1 rounded-sm ${
                       isEarned 
                         ? 'bg-green-500/10 text-green-400 border border-green-500/10' 
-                        : 'bg-zinc-500/10 text-zinc-400 border border-white/5'
+                        : 'bg-muted text-muted-foreground border border-border'
                     }`}>
                       {isEarned ? 'Unlocked' : 'Locked'}
                     </span>
                   </p>
-                  <p className="text-[9.5px] leading-relaxed text-zinc-400">
+                  <p className="text-[9.5px] leading-relaxed text-muted-foreground">
                     {badge.description}
                   </p>
                 </div>

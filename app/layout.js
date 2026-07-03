@@ -31,7 +31,6 @@ export default function RootLayout({ children }) {
           <ThemeProvider
             attribute="class"
             defaultTheme="dark"
-            forcedTheme="dark"
             disableTransitionOnChange
           >
             {children}

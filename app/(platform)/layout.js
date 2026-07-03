@@ -7,7 +7,7 @@ import { UserButton, useUser } from "@clerk/nextjs";
 import { 
   LayoutDashboard, FileText, Globe, Target, PenBox, GraduationCap, 
   Building2, Brain, IndianRupee, Share2, ListTodo, Users, 
-  Menu, X, GitCompare
+  Menu, X, GitCompare, Palette
 } from "lucide-react";
 import AIAssistantBubble from "@/app/components/ai-assistant-bubble";
 
@@ -91,6 +91,7 @@ export default function PlatformLayout({ children }) {
     { href: "/linkedin-optimizer", label: "LinkedIn SEO", icon: Share2 },
     { href: "/job-tracker", label: "AI Job Tracker", icon: ListTodo },
     { href: "/networking", label: "Referral Gen", icon: Users },
+    { href: "/theme", label: "Theme Settings", icon: Palette },
   ];
 
   // Helper to check active state
@@ -120,6 +121,7 @@ export default function PlatformLayout({ children }) {
       "job-tracker": "Job Tracker",
       networking: "Referral Generator",
       "offer-compare": "Compare Offers",
+      theme: "Theme Settings",
     };
 
     return parts.map((part, index) => {
@@ -145,33 +147,33 @@ export default function PlatformLayout({ children }) {
   const currentTitle = navItems.find(item => isItemActive(item.href))?.label || "Workspace";
 
   return (
-    <div className="min-h-screen bg-[#030303] text-zinc-100 flex overflow-x-hidden">
+    <div className="min-h-screen bg-background text-foreground flex overflow-x-hidden">
       
       {/* 1. Desktop Sidebar */}
-      <aside className={`hidden md:flex flex-col fixed top-0 left-0 h-screen bg-[#09090b]/80 backdrop-blur-xl border-r border-white/5 z-40 transition-all duration-300 overflow-x-hidden select-none ${
+      <aside className={`hidden md:flex flex-col fixed top-0 left-0 h-screen bg-sidebar/80 backdrop-blur-xl border-r border-sidebar-border z-40 transition-all duration-300 overflow-x-hidden select-none ${
         isCollapsed ? "w-12" : "w-48"
       }`}>
         {/* Brand Header */}
-        <div className={`h-10 flex items-center border-b border-white/5 overflow-x-hidden ${
+        <div className={`h-10 flex items-center border-b border-sidebar-border overflow-x-hidden ${
           isCollapsed ? "justify-center px-0" : "justify-between px-3"
         }`}>
           {isCollapsed ? (
             <button 
               onClick={toggleSidebar}
-              className="flex items-center justify-center h-7 w-7 rounded-lg hover:bg-white/5 text-zinc-400 hover:text-white cursor-pointer transition-colors"
+              className="flex items-center justify-center h-7 w-7 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground/70 hover:text-sidebar-foreground cursor-pointer transition-colors"
               title="Expand Sidebar"
             >
               <Menu className="h-3.5 w-3.5" />
             </button>
           ) : (
             <>
-              <Link href="/" className="flex items-center gap-1.5 select-none font-extrabold text-white tracking-tight hover:opacity-85 transition-opacity">
-                <span className="h-4.5 w-4.5 rounded-md bg-indigo-600 flex items-center justify-center text-[9px] font-black text-white shadow-[0_0_10px_rgba(99,102,241,0.4)] shrink-0">S</span>
+              <Link href="/" className="flex items-center gap-1.5 select-none font-extrabold text-foreground tracking-tight hover:opacity-85 transition-opacity">
+                <span className="h-4.5 w-4.5 rounded-md bg-primary flex items-center justify-center text-[9px] font-black text-primary-foreground shadow-md shrink-0">S</span>
                 <span className="text-xs font-bold">Sage AI</span>
               </Link>
               <button 
                 onClick={toggleSidebar}
-                className="p-0.5 rounded-md text-zinc-400 hover:text-white hover:bg-white/5 cursor-pointer transition-colors"
+                className="p-0.5 rounded-md text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent cursor-pointer transition-colors"
                 title="Collapse Sidebar"
               >
                 <X className="h-3 w-3" />
@@ -191,19 +193,19 @@ export default function PlatformLayout({ children }) {
                 href={item.href}
                 className={`flex items-center gap-2 py-1.5 px-2 rounded-lg transition-all duration-200 group relative ${
                   active 
-                    ? "bg-indigo-600/10 text-white font-bold" 
-                    : "text-zinc-400 hover:text-zinc-200 hover:bg-white/5"
+                    ? "bg-primary/10 text-primary font-bold" 
+                    : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
                 } ${isCollapsed ? "justify-center" : ""}`}
                 title={isCollapsed ? item.label : undefined}
               >
                 <IconComponent className={`h-3.5 w-3.5 shrink-0 transition-transform duration-200 ${
-                  active ? "text-indigo-400 scale-105" : "text-zinc-400 group-hover:scale-105 group-hover:text-zinc-200"
+                  active ? "text-primary scale-105" : "text-sidebar-foreground/60 group-hover:scale-105 group-hover:text-sidebar-foreground"
                 }`} />
                 {!isCollapsed && <span className="text-[12px] tracking-wide truncate">{item.label}</span>}
                 
                 {/* Collapsed Tooltip */}
                 {isCollapsed && (
-                  <div className="absolute left-full ml-3 px-2 py-1 rounded bg-[#09090b] border border-white/10 text-[9px] text-white font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50 shadow-xl">
+                  <div className="absolute left-full ml-3 px-2 py-1 rounded bg-popover border border-border text-[9px] text-popover-foreground font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50 shadow-xl">
                     {item.label}
                   </div>
                 )}
@@ -211,8 +213,6 @@ export default function PlatformLayout({ children }) {
             );
           })}
         </nav>
-
-
       </aside>
 
       {/* 2. Mobile Sidebar Drawer Overlay */}
@@ -224,17 +224,17 @@ export default function PlatformLayout({ children }) {
       )}
       
       {/* 3. Mobile Sidebar Drawer Panel */}
-      <aside className={`fixed top-0 left-0 h-screen w-48 bg-[#09090b] border-r border-white/5 z-50 flex flex-col md:hidden transition-transform duration-300 ease-in-out overflow-x-hidden select-none ${
+      <aside className={`fixed top-0 left-0 h-screen w-48 bg-sidebar border-r border-sidebar-border z-50 flex flex-col md:hidden transition-transform duration-300 ease-in-out overflow-x-hidden select-none ${
         isMobileOpen ? "translate-x-0" : "-translate-x-full"
       }`}>
-        <div className="h-10 flex items-center justify-between px-3 border-b border-white/5">
-          <Link href="/" className="flex items-center gap-1.5 font-extrabold text-white tracking-tight">
-            <span className="h-4.5 w-4.5 rounded-md bg-indigo-600 flex items-center justify-center text-[9px] font-black text-white">S</span>
+        <div className="h-10 flex items-center justify-between px-3 border-b border-sidebar-border">
+          <Link href="/" className="flex items-center gap-1.5 font-extrabold text-foreground tracking-tight">
+            <span className="h-4.5 w-4.5 rounded-md bg-primary flex items-center justify-center text-[9px] font-black text-primary-foreground">S</span>
             <span className="text-xs font-bold">Sage AI</span>
           </Link>
           <button 
             onClick={() => setIsMobileOpen(false)}
-            className="p-1 text-zinc-400 hover:text-white rounded-lg cursor-pointer"
+            className="p-1 text-sidebar-foreground/75 hover:text-sidebar-foreground rounded-lg cursor-pointer"
           >
             <X className="h-3.5 w-3.5" />
           </button>
@@ -250,8 +250,8 @@ export default function PlatformLayout({ children }) {
                 href={item.href}
                 className={`flex items-center gap-2 py-1.5 px-2 rounded-lg transition-colors duration-200 ${
                   active 
-                    ? "bg-indigo-600/10 text-white font-bold" 
-                    : "text-zinc-400 hover:text-zinc-200 hover:bg-white/5"
+                    ? "bg-primary/10 text-primary font-bold" 
+                    : "text-sidebar-foreground/75 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
                 }`}
               >
                 <IconComponent className="h-3.5 w-3.5" />
@@ -260,8 +260,6 @@ export default function PlatformLayout({ children }) {
             );
           })}
         </nav>
-
-
       </aside>
 
       {/* 4. Main Page Right Outlet Area */}
@@ -270,12 +268,12 @@ export default function PlatformLayout({ children }) {
       }`}>
         
         {/* Top Header Bar */}
-        <header className="h-10 border-b border-white/5 bg-[#030303]/70 backdrop-blur-md sticky top-0 z-30 px-3 flex items-center justify-between relative select-none">
+        <header className="h-10 border-b border-sidebar-border bg-background/70 backdrop-blur-md sticky top-0 z-30 px-3 flex items-center justify-between relative select-none">
           {/* Left: Mobile hamburger */}
           <div className="flex items-center">
             <button 
               onClick={() => setIsMobileOpen(true)}
-              className="md:hidden p-1 text-zinc-400 hover:text-white rounded-lg hover:bg-white/5 -ml-1 cursor-pointer"
+              className="md:hidden p-1 text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted -ml-1 cursor-pointer"
               aria-label="Open navigation drawer"
             >
               <Menu className="h-3.5 w-3.5" />
@@ -284,10 +282,10 @@ export default function PlatformLayout({ children }) {
           
           {/* Center: Title / Breadcrumbs (Centered) */}
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center">
-            <nav className="hidden sm:flex items-center text-[11px] tracking-wide uppercase font-bold text-zinc-400 font-mono">
+            <nav className="hidden sm:flex items-center text-[11px] tracking-wide uppercase font-bold text-muted-foreground font-mono">
               {getBreadcrumbs()}
             </nav>
-            <span className="sm:hidden text-xs font-extrabold text-white tracking-tight">
+            <span className="sm:hidden text-xs font-extrabold text-foreground tracking-tight">
               {currentTitle}
             </span>
           </div>
@@ -299,9 +297,9 @@ export default function PlatformLayout({ children }) {
                 afterSignOutUrl="/"
                 appearance={{
                   elements: {
-                    avatarBox: "h-6 w-6 ring-2 ring-indigo-500/20 hover:ring-indigo-500/50 transition-all",
-                    userButtonPopoverCard: "shadow-xl border border-white/5 bg-[#09090b]",
-                    userPreviewMainIdentifier: "font-semibold text-xs text-white",
+                    avatarBox: "h-6 w-6 ring-2 ring-primary/20 hover:ring-primary/50 transition-all",
+                    userButtonPopoverCard: "shadow-xl border border-border bg-popover text-popover-foreground",
+                    userPreviewMainIdentifier: "font-semibold text-xs text-foreground",
                     userPreviewSecondaryIdentifier: "text-[10px] text-muted-foreground"
                   }
                 }}

@@ -1,6 +1,9 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+@plugin "daisyui" {
+  themes: light --default, dark --prefersdark, cupcake, bumblebee, emerald, synthwave, retro, cyberpunk, valentine, aqua, dracula, nord;
+}
 
 @custom-variant dark (&:is(.dark *));
 
@@ -28,13 +31,10 @@
   --color-border: var(--border);
   --color-destructive: var(--destructive);
   --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
   --color-muted: var(--muted);
   --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
   --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
@@ -49,41 +49,47 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
+  /* Map Shadcn variables to DaisyUI v5 variables */
+  --background: var(--color-base-100);
+  --foreground: var(--color-base-content);
+  --card: var(--color-base-200);
+  --card-foreground: var(--color-base-content);
+  --popover: var(--color-base-200);
+  --popover-foreground: var(--color-base-content);
+  --primary: var(--color-primary);
+  --primary-foreground: var(--color-primary-content);
+  --secondary: var(--color-secondary);
+  --secondary-foreground: var(--color-secondary-content);
+  --muted: var(--color-base-300);
+  --muted-foreground: color-mix(in oklch, var(--color-base-content) 60%, transparent);
+  --accent: var(--color-accent);
+  --accent-foreground: var(--color-accent-content);
+  --destructive: var(--color-error, oklch(0.577 0.245 27.325));
+  --border: color-mix(in oklch, var(--color-base-content) 10%, transparent);
+  --input: color-mix(in oklch, var(--color-base-content) 12%, transparent);
+  --ring: var(--color-primary);
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  
+  /* Sidebar variable mappings */
+  --sidebar: var(--color-base-200);
+  --sidebar-foreground: var(--color-base-content);
+  --sidebar-primary: var(--color-primary);
+  --sidebar-primary-foreground: var(--color-primary-content);
+  --sidebar-accent: var(--color-base-300);
+  --sidebar-accent-foreground: var(--color-base-content);
+  --sidebar-border: color-mix(in oklch, var(--color-base-content) 8%, transparent);
+  --sidebar-ring: var(--color-primary);
+
+  /* Chart colors (fallbacks) */
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
 }
 
 .dark {
+  /* Our custom dark theme variables (preserved for 'dark' mode) */
   --background: oklch(0.08 0.01 250);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.12 0.01 250);
@@ -115,6 +121,20 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: rgba(255, 255, 255, 0.06);
   --sidebar-ring: oklch(0.6 0.18 260);
+
+  /* Map DaisyUI v5 variables to our custom dark theme variables so DaisyUI components look correct in dark mode */
+  --color-primary: var(--primary);
+  --color-primary-content: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-content: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-content: var(--accent-foreground);
+  --color-neutral: oklch(0.15 0.01 250);
+  --color-neutral-content: oklch(0.985 0 0);
+  --color-base-100: var(--background);
+  --color-base-200: var(--card);
+  --color-base-300: oklch(0.15 0.01 250);
+  --color-base-content: var(--foreground);
 }
 
 @layer base {
@@ -166,7 +186,7 @@
 }
 
 @utility gradient {
-  @apply bg-gradient-to-b from-white via-zinc-200 to-zinc-400;
+  @apply bg-gradient-to-b from-foreground via-foreground/85 to-foreground/65;
 }
 
 @utility gradient-title {
@@ -247,7 +267,7 @@
     animation: scroll 40s linear infinite;
 }
 .mesh-gradient {
-    background-color: #030303;
+    background-color: var(--background);
     background-image: 
         radial-gradient(at 50% 0%, rgba(99, 102, 241, 0.08) 0, transparent 55%), 
         radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.02) 0, transparent 40%);
@@ -457,4 +477,60 @@
   font-size: 0.85em !important;
   color: #555 !important;
   font-family: sans-serif !important;
+}
+
+/* ==========================================
+   THEME COMPATIBILITY LAYER (VIRTUAL PATCH)
+   Converts hardcoded dark-theme styles in JSX
+   into theme-responsive styles dynamically.
+   Only active when NOT in the dark theme.
+   ========================================== */
+html:not(.dark) {
+  /* Match backgrounds with or without opacities */
+  [class*="bg-[#030303]"] { background-color: var(--background) !important; }
+  [class*="bg-[#09090b]"] { background-color: var(--card) !important; }
+  [class*="bg-[#0d0e15]"] { background-color: var(--card) !important; }
+  [class*="bg-[#18181b]"] { background-color: var(--muted) !important; }
+  
+  /* Match zinc dark backgrounds */
+  [class*="bg-zinc-9"] { background-color: var(--muted) !important; }
+  [class*="bg-zinc-800"] { background-color: color-mix(in oklch, var(--muted) 80%, var(--foreground)) !important; }
+
+  /* Match white overlay backgrounds (e.g. bg-white/5, bg-white/[0.01]) */
+  [class*="bg-white/"] { background-color: color-mix(in oklch, var(--foreground) 5%, transparent) !important; }
+  
+  /* Match borders */
+  [class*="border-white/"] { border-color: color-mix(in oklch, var(--foreground) 10%, transparent) !important; }
+  [class*="border-zinc-8"] { border-color: var(--border) !important; }
+
+  /* Match texts */
+  [class*="text-zinc-1"] { color: var(--foreground) !important; }
+  [class*="text-zinc-2"] { color: var(--foreground) !important; }
+  [class*="text-zinc-3"] { color: var(--foreground) !important; }
+  [class*="text-zinc-4"] { color: var(--muted-foreground) !important; }
+  [class*="text-zinc-5"] { color: var(--muted-foreground) !important; }
+
+  /* Fix hardcoded text colors on light backgrounds */
+  .text-white {
+    color: var(--foreground) !important;
+  }
+
+  /* Exclude buttons, badges, and colored backgrounds from text-white override */
+  button.text-white,
+  button .text-white,
+  .btn.text-white,
+  .btn .text-white,
+  .badge.text-white,
+  .badge .text-white,
+  [class*="bg-primary"] .text-white,
+  [class*="bg-indigo"] .text-white,
+  [class*="bg-blue"] .text-white,
+  [class*="bg-emerald"] .text-white,
+  [class*="bg-green"] .text-white,
+  [class*="bg-red"] .text-white,
+  [class*="bg-rose"] .text-white,
+  [class*="bg-orange"] .text-white,
+  [class*="bg-violet"] .text-white {
+    color: #ffffff !important;
+  }
 }

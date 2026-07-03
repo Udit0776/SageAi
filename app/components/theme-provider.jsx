@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { ThemeProvider as NextThemesProvider } from "next-themes"
+import { ThemeProvider as NextThemesProvider, useTheme } from "next-themes"
 
 // Suppress React 19 development-only warning regarding script tags inside next-themes
 if (typeof window !== "undefined" && process.env.NODE_ENV === "development") {
@@ -17,6 +17,21 @@ if (typeof window !== "undefined" && process.env.NODE_ENV === "development") {
   };
 }
 
+function ThemeSync() {
+  const { theme } = useTheme()
+  React.useEffect(() => {
+    if (theme) {
+      document.documentElement.setAttribute("data-theme", theme)
+    }
+  }, [theme])
+  return null
+}
+
 export function ThemeProvider({ children, ...props }) {
-    return <NextThemesProvider {...props}>{children}</NextThemesProvider>
+    return (
+      <NextThemesProvider {...props}>
+        <ThemeSync />
+        {children}
+      </NextThemesProvider>
+    )
 }
