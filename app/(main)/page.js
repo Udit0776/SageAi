@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   Brain,
@@ -120,7 +120,7 @@ function DashboardMockup() {
         </div>
 
         {/* Dashboard Panels */}
-        <div className="p-5 col-span-2 space-y-4 overflow-y-auto">
+        <div className="p-5 col-span-2 space-y-4 overflow-hidden">
           {/* Top stats */}
           <div className="grid grid-cols-2 gap-3">
             <div className="p-3.5 rounded-xl border border-border bg-muted">
@@ -322,6 +322,15 @@ function BrandLogos() {
 }
 
 export default function Home() {
+  const [activeStep, setActiveStep] = useState(1);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveStep((prev) => (prev % 4) + 1);
+    }, 3000);
+    return () => clearInterval(timer);
+  }, []);
+
   useEffect(() => {
     // Scroll animation reveal handler
     const observerOptions = {
@@ -695,38 +704,46 @@ export default function Home() {
             </p>
 
             {/* Clean CSS Flow Visual Block */}
-            <div className="w-full p-6 bg-muted border border-border rounded-2xl space-y-4 shadow-xl">
+            <div className="w-full p-6 bg-card border border-border rounded-2xl space-y-4 shadow-xl">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-mono text-muted-foreground">
                   SYSTEM FLOW DIAGRAM
                 </span>
                 <span className="text-[9px] bg-primary/10 text-primary px-2 py-0.5 rounded font-mono">
-                  Ready
+                  {activeStep === 4 ? "Complete" : "Running"}
                 </span>
               </div>
               <div className="space-y-2.5">
-                <div className="flex items-center justify-between p-2.5 rounded bg-background border border-border">
+                <div className={`flex items-center justify-between p-2.5 rounded bg-background border transition-colors duration-500 ${activeStep === 1 ? 'border-primary' : 'border-border'}`}>
                   <span className="text-[11px] font-mono text-muted-foreground">
                     01 / PARSE_RESUME
                   </span>
-                  <div className="h-1.5 w-16 bg-primary/20 rounded overflow-hidden">
-                    <div className="h-full w-full bg-primary"></div>
+                  <div className="h-1.5 w-16 bg-base-300 rounded overflow-hidden">
+                    <div className={`h-full bg-primary transition-all duration-1000 ease-in-out ${activeStep >= 1 ? 'w-full' : 'w-0'} ${activeStep === 1 ? 'animate-pulse' : ''}`}></div>
                   </div>
                 </div>
-                <div className="flex items-center justify-between p-2.5 rounded bg-background border border-border">
+                <div className={`flex items-center justify-between p-2.5 rounded bg-background border transition-colors duration-500 ${activeStep === 2 ? 'border-primary' : 'border-border'}`}>
                   <span className="text-[11px] font-mono text-muted-foreground">
                     02 / FIT_SCORE_MODEL
                   </span>
-                  <div className="h-1.5 w-16 bg-primary/20 rounded overflow-hidden">
-                    <div className="h-full w-[85%] bg-primary"></div>
+                  <div className="h-1.5 w-16 bg-base-300 rounded overflow-hidden">
+                    <div className={`h-full bg-primary transition-all duration-1000 ease-in-out ${activeStep >= 2 ? 'w-full' : 'w-0'} ${activeStep === 2 ? 'animate-pulse' : ''}`}></div>
                   </div>
                 </div>
-                <div className="flex items-center justify-between p-2.5 rounded bg-background border border-border">
+                <div className={`flex items-center justify-between p-2.5 rounded bg-background border transition-colors duration-500 ${activeStep === 3 ? 'border-primary' : 'border-border'}`}>
                   <span className="text-[11px] font-mono text-muted-foreground">
                     03 / COACH_SIMULATE
                   </span>
-                  <div className="h-1.5 w-16 bg-primary/20 rounded overflow-hidden">
-                    <div className="h-full w-[60%] bg-primary animate-pulse"></div>
+                  <div className="h-1.5 w-16 bg-base-300 rounded overflow-hidden">
+                    <div className={`h-full bg-primary transition-all duration-1000 ease-in-out ${activeStep >= 3 ? 'w-full' : 'w-0'} ${activeStep === 3 ? 'animate-pulse' : ''}`}></div>
+                  </div>
+                </div>
+                <div className={`flex items-center justify-between p-2.5 rounded bg-background border transition-colors duration-500 ${activeStep === 4 ? 'border-primary' : 'border-border'}`}>
+                  <span className="text-[11px] font-mono text-muted-foreground">
+                    04 / MAXIMIZE_COMP
+                  </span>
+                  <div className="h-1.5 w-16 bg-base-300 rounded overflow-hidden">
+                    <div className={`h-full bg-primary transition-all duration-1000 ease-in-out ${activeStep >= 4 ? 'w-full' : 'w-0'} ${activeStep === 4 ? 'animate-pulse' : ''}`}></div>
                   </div>
                 </div>
               </div>
@@ -739,11 +756,11 @@ export default function Home() {
             <div className="absolute left-5 top-0 bottom-0 w-px border-l border-dashed border-border z-0"></div>
 
             {/* Step 1 */}
-            <div className="relative z-10 pl-16 group">
-              <div className="absolute left-0 top-0 w-10 h-10 rounded-full bg-background border border-primary flex items-center justify-center font-mono text-xs text-primary group-hover:shadow-[0_0_15px_rgba(99,102,241,0.2)] transition-all">
+            <div className={`relative z-10 pl-16 group transition-all duration-500 ${activeStep === 1 ? 'opacity-100 scale-105' : 'opacity-50'}`}>
+              <div className={`absolute left-0 top-0 w-10 h-10 rounded-full bg-background border flex items-center justify-center font-mono text-xs transition-all duration-500 ${activeStep === 1 ? 'border-primary text-primary shadow-[0_0_15px_rgba(var(--color-primary),0.3)]' : activeStep > 1 ? 'border-primary bg-primary text-primary-content' : 'border-border text-muted-foreground'}`}>
                 01
               </div>
-              <h3 className="text-sm font-bold mb-1.5 text-foreground">
+              <h3 className={`text-sm font-bold mb-1.5 transition-colors ${activeStep === 1 ? 'text-primary' : 'text-foreground'}`}>
                 Initialize Profile
               </h3>
               <p className="text-muted-foreground text-[11px] leading-relaxed">
@@ -754,11 +771,11 @@ export default function Home() {
             </div>
 
             {/* Step 2 */}
-            <div className="relative z-10 pl-16 group">
-              <div className="absolute left-0 top-0 w-10 h-10 rounded-full bg-background border border-border flex items-center justify-center font-mono text-xs text-muted-foreground group-hover:border-primary group-hover:text-primary transition-all">
+            <div className={`relative z-10 pl-16 group transition-all duration-500 ${activeStep === 2 ? 'opacity-100 scale-105' : 'opacity-50'}`}>
+              <div className={`absolute left-0 top-0 w-10 h-10 rounded-full bg-background border flex items-center justify-center font-mono text-xs transition-all duration-500 ${activeStep === 2 ? 'border-primary text-primary shadow-[0_0_15px_rgba(var(--color-primary),0.3)]' : activeStep > 2 ? 'border-primary bg-primary text-primary-content' : 'border-border text-muted-foreground'}`}>
                 02
               </div>
-              <h3 className="text-sm font-bold mb-1.5 text-foreground">
+              <h3 className={`text-sm font-bold mb-1.5 transition-colors ${activeStep === 2 ? 'text-primary' : 'text-foreground'}`}>
                 Tailor Materials
               </h3>
               <p className="text-muted-foreground text-[11px] leading-relaxed">
@@ -769,11 +786,11 @@ export default function Home() {
             </div>
 
             {/* Step 3 */}
-            <div className="relative z-10 pl-16 group">
-              <div className="absolute left-0 top-0 w-10 h-10 rounded-full bg-background border border-border flex items-center justify-center font-mono text-xs text-muted-foreground group-hover:border-indigo-400 group-hover:text-indigo-400 transition-all">
+            <div className={`relative z-10 pl-16 group transition-all duration-500 ${activeStep === 3 ? 'opacity-100 scale-105' : 'opacity-50'}`}>
+              <div className={`absolute left-0 top-0 w-10 h-10 rounded-full bg-background border flex items-center justify-center font-mono text-xs transition-all duration-500 ${activeStep === 3 ? 'border-primary text-primary shadow-[0_0_15px_rgba(var(--color-primary),0.3)]' : activeStep > 3 ? 'border-primary bg-primary text-primary-content' : 'border-border text-muted-foreground'}`}>
                 03
               </div>
-              <h3 className="text-sm font-bold mb-1.5 text-foreground">
+              <h3 className={`text-sm font-bold mb-1.5 transition-colors ${activeStep === 3 ? 'text-primary' : 'text-foreground'}`}>
                 Simulate Boardrooms
               </h3>
               <p className="text-muted-foreground text-[11px] leading-relaxed">
@@ -784,11 +801,11 @@ export default function Home() {
             </div>
 
             {/* Step 4 */}
-            <div className="relative z-10 pl-16 group">
-              <div className="absolute left-0 top-0 w-10 h-10 rounded-full bg-background border border-border flex items-center justify-center font-mono text-xs text-muted-foreground group-hover:border-indigo-400 group-hover:text-indigo-400 transition-all">
+            <div className={`relative z-10 pl-16 group transition-all duration-500 ${activeStep === 4 ? 'opacity-100 scale-105' : 'opacity-50'}`}>
+              <div className={`absolute left-0 top-0 w-10 h-10 rounded-full bg-background border flex items-center justify-center font-mono text-xs transition-all duration-500 ${activeStep === 4 ? 'border-primary text-primary shadow-[0_0_15px_rgba(var(--color-primary),0.3)]' : 'border-border text-muted-foreground'}`}>
                 04
               </div>
-              <h3 className="text-sm font-bold mb-1.5 text-foreground">
+              <h3 className={`text-sm font-bold mb-1.5 transition-colors ${activeStep === 4 ? 'text-primary' : 'text-foreground'}`}>
                 Maximize Compensation
               </h3>
               <p className="text-muted-foreground text-[11px] leading-relaxed">
