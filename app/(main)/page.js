@@ -192,18 +192,16 @@ function DashboardMockup() {
                 <div className="text-[10px] font-semibold text-foreground truncate">
                   Apple
                 </div>
-                <div className="text-[8px] text-muted-foreground">Senior Architect</div>
+                <div className="text-[8px] text-muted-foreground">
+                  Senior Architect
+                </div>
               </div>
               <div className="p-2 rounded bg-primary/10 border border-primary/20 space-y-1">
-                <div className="text-[8px] text-primary font-mono">
-                  OFFERED
-                </div>
+                <div className="text-[8px] text-primary font-mono">OFFERED</div>
                 <div className="text-[10px] font-semibold text-primary truncate">
                   Netflix
                 </div>
-                <div className="text-[8px] text-primary/80">
-                  $155,000/yr
-                </div>
+                <div className="text-[8px] text-primary/80">$155,000/yr</div>
               </div>
             </div>
           </div>
@@ -266,7 +264,9 @@ function InterviewMockup() {
             <div className="text-[8px] text-muted-foreground font-mono">
               STAR METHOD
             </div>
-            <div className="text-xs font-bold text-foreground font-mono">92%</div>
+            <div className="text-xs font-bold text-foreground font-mono">
+              92%
+            </div>
           </div>
           <div className="text-center">
             <div className="text-[8px] text-muted-foreground font-mono">
@@ -277,7 +277,9 @@ function InterviewMockup() {
             </div>
           </div>
           <div className="text-center">
-            <div className="text-[8px] text-muted-foreground font-mono">TONE</div>
+            <div className="text-[8px] text-muted-foreground font-mono">
+              TONE
+            </div>
             <div className="text-xs font-bold text-accent font-mono">
               Confident
             </div>
@@ -287,40 +289,6 @@ function InterviewMockup() {
     </div>
   );
 }
-
-// Brand Logo Strip (Replaces the "LIVE MARKET" crypto ticker)
-function BrandLogos() {
-  return (
-    <section className="border-y border-border bg-background py-10 relative z-20 overflow-hidden select-none">
-      <div className="max-w-7xl mx-auto px-6 md:px-8">
-        <p className="text-center text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-8">
-          Trusted by professionals at top technology teams
-        </p>
-        <div className="flex flex-wrap items-center justify-center gap-12 md:gap-20 opacity-40 grayscale hover:opacity-75 transition-all duration-300">
-          <span className="font-extrabold text-foreground text-base tracking-tighter">
-            Vercel
-          </span>
-          <span className="font-extrabold text-foreground text-base tracking-tighter">
-            Stripe
-          </span>
-          <span className="font-extrabold text-foreground text-base tracking-tighter">
-            Linear
-          </span>
-          <span className="font-extrabold text-foreground text-base tracking-tighter">
-            Figma
-          </span>
-          <span className="font-extrabold text-foreground text-base tracking-tighter">
-            Airbnb
-          </span>
-          <span className="font-extrabold text-foreground text-base tracking-tighter">
-            Sentry
-          </span>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 export default function Home() {
   const [activeStep, setActiveStep] = useState(1);
 
@@ -421,8 +389,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Brand Logos */}
-      <BrandLogos />
+
 
       {/* Bento Capabilities Grid */}
       <section
@@ -490,8 +457,16 @@ export default function Home() {
                     fx="50%"
                     fy="50%"
                   >
-                    <stop offset="0%" stopColor="currentColor" stopOpacity="0.25" />
-                    <stop offset="100%" stopColor="currentColor" stopOpacity="0" />
+                    <stop
+                      offset="0%"
+                      stopColor="currentColor"
+                      stopOpacity="0.25"
+                    />
+                    <stop
+                      offset="100%"
+                      stopColor="currentColor"
+                      stopOpacity="0"
+                    />
                   </radialGradient>
                 </defs>
 
@@ -612,7 +587,9 @@ export default function Home() {
             <div className="h-8 w-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center border border-primary/20">
               <Coins className="h-4.5 w-4.5 text-primary" />
             </div>
-            <h4 className="text-sm font-bold text-foreground">Salary Negotiator</h4>
+            <h4 className="text-sm font-bold text-foreground">
+              Salary Negotiator
+            </h4>
             <p className="text-muted-foreground text-[10px] sm:text-[11px] leading-relaxed">
               Real-world simulated roleplay simulations with recruiters to build
               confidence and maximize compensation packages.
@@ -634,7 +611,9 @@ export default function Home() {
             <div className="h-8 w-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center border border-primary/20">
               <BadgeCheck className="h-4.5 w-4.5 text-primary" />
             </div>
-            <h4 className="text-sm font-bold text-foreground">Skill Gap Analysis</h4>
+            <h4 className="text-sm font-bold text-foreground">
+              Skill Gap Analysis
+            </h4>
             <p className="text-muted-foreground text-[10px] sm:text-[11px] leading-relaxed">
               Instantly compare job descriptions with your active resume to
               discover missing skills and weekly roadmap tasks.
@@ -714,36 +693,52 @@ export default function Home() {
                 </span>
               </div>
               <div className="space-y-2.5">
-                <div className={`flex items-center justify-between p-2.5 rounded bg-background border transition-colors duration-500 ${activeStep === 1 ? 'border-primary' : 'border-border'}`}>
+                <div
+                  className={`flex items-center justify-between p-2.5 rounded bg-background border transition-colors duration-500 ${activeStep === 1 ? "border-primary" : "border-border"}`}
+                >
                   <span className="text-[11px] font-mono text-muted-foreground">
                     01 / PARSE_RESUME
                   </span>
                   <div className="h-1.5 w-16 bg-base-300 rounded overflow-hidden">
-                    <div className={`h-full bg-primary transition-all duration-1000 ease-in-out ${activeStep >= 1 ? 'w-full' : 'w-0'} ${activeStep === 1 ? 'animate-pulse' : ''}`}></div>
+                    <div
+                      className={`h-full bg-primary transition-all duration-1000 ease-in-out ${activeStep >= 1 ? "w-full" : "w-0"} ${activeStep === 1 ? "animate-pulse" : ""}`}
+                    ></div>
                   </div>
                 </div>
-                <div className={`flex items-center justify-between p-2.5 rounded bg-background border transition-colors duration-500 ${activeStep === 2 ? 'border-primary' : 'border-border'}`}>
+                <div
+                  className={`flex items-center justify-between p-2.5 rounded bg-background border transition-colors duration-500 ${activeStep === 2 ? "border-primary" : "border-border"}`}
+                >
                   <span className="text-[11px] font-mono text-muted-foreground">
                     02 / FIT_SCORE_MODEL
                   </span>
                   <div className="h-1.5 w-16 bg-base-300 rounded overflow-hidden">
-                    <div className={`h-full bg-primary transition-all duration-1000 ease-in-out ${activeStep >= 2 ? 'w-full' : 'w-0'} ${activeStep === 2 ? 'animate-pulse' : ''}`}></div>
+                    <div
+                      className={`h-full bg-primary transition-all duration-1000 ease-in-out ${activeStep >= 2 ? "w-full" : "w-0"} ${activeStep === 2 ? "animate-pulse" : ""}`}
+                    ></div>
                   </div>
                 </div>
-                <div className={`flex items-center justify-between p-2.5 rounded bg-background border transition-colors duration-500 ${activeStep === 3 ? 'border-primary' : 'border-border'}`}>
+                <div
+                  className={`flex items-center justify-between p-2.5 rounded bg-background border transition-colors duration-500 ${activeStep === 3 ? "border-primary" : "border-border"}`}
+                >
                   <span className="text-[11px] font-mono text-muted-foreground">
                     03 / COACH_SIMULATE
                   </span>
                   <div className="h-1.5 w-16 bg-base-300 rounded overflow-hidden">
-                    <div className={`h-full bg-primary transition-all duration-1000 ease-in-out ${activeStep >= 3 ? 'w-full' : 'w-0'} ${activeStep === 3 ? 'animate-pulse' : ''}`}></div>
+                    <div
+                      className={`h-full bg-primary transition-all duration-1000 ease-in-out ${activeStep >= 3 ? "w-full" : "w-0"} ${activeStep === 3 ? "animate-pulse" : ""}`}
+                    ></div>
                   </div>
                 </div>
-                <div className={`flex items-center justify-between p-2.5 rounded bg-background border transition-colors duration-500 ${activeStep === 4 ? 'border-primary' : 'border-border'}`}>
+                <div
+                  className={`flex items-center justify-between p-2.5 rounded bg-background border transition-colors duration-500 ${activeStep === 4 ? "border-primary" : "border-border"}`}
+                >
                   <span className="text-[11px] font-mono text-muted-foreground">
                     04 / MAXIMIZE_COMP
                   </span>
                   <div className="h-1.5 w-16 bg-base-300 rounded overflow-hidden">
-                    <div className={`h-full bg-primary transition-all duration-1000 ease-in-out ${activeStep >= 4 ? 'w-full' : 'w-0'} ${activeStep === 4 ? 'animate-pulse' : ''}`}></div>
+                    <div
+                      className={`h-full bg-primary transition-all duration-1000 ease-in-out ${activeStep >= 4 ? "w-full" : "w-0"} ${activeStep === 4 ? "animate-pulse" : ""}`}
+                    ></div>
                   </div>
                 </div>
               </div>
@@ -756,11 +751,17 @@ export default function Home() {
             <div className="absolute left-5 top-0 bottom-0 w-px border-l border-dashed border-border z-0"></div>
 
             {/* Step 1 */}
-            <div className={`relative z-10 pl-16 group transition-all duration-500 ${activeStep === 1 ? 'opacity-100 scale-105' : 'opacity-50'}`}>
-              <div className={`absolute left-0 top-0 w-10 h-10 rounded-full bg-background border flex items-center justify-center font-mono text-xs transition-all duration-500 ${activeStep === 1 ? 'border-primary text-primary shadow-[0_0_15px_rgba(var(--color-primary),0.3)]' : activeStep > 1 ? 'border-primary bg-primary text-primary-content' : 'border-border text-muted-foreground'}`}>
+            <div
+              className={`relative z-10 pl-16 group transition-all duration-500 ${activeStep === 1 ? "opacity-100 scale-105" : "opacity-50"}`}
+            >
+              <div
+                className={`absolute left-0 top-0 w-10 h-10 rounded-full bg-background border flex items-center justify-center font-mono text-xs transition-all duration-500 ${activeStep === 1 ? "border-primary text-primary shadow-[0_0_15px_rgba(var(--color-primary),0.3)]" : activeStep > 1 ? "border-primary bg-primary text-primary-content" : "border-border text-muted-foreground"}`}
+              >
                 01
               </div>
-              <h3 className={`text-sm font-bold mb-1.5 transition-colors ${activeStep === 1 ? 'text-primary' : 'text-foreground'}`}>
+              <h3
+                className={`text-sm font-bold mb-1.5 transition-colors ${activeStep === 1 ? "text-primary" : "text-foreground"}`}
+              >
                 Initialize Profile
               </h3>
               <p className="text-muted-foreground text-[11px] leading-relaxed">
@@ -771,11 +772,17 @@ export default function Home() {
             </div>
 
             {/* Step 2 */}
-            <div className={`relative z-10 pl-16 group transition-all duration-500 ${activeStep === 2 ? 'opacity-100 scale-105' : 'opacity-50'}`}>
-              <div className={`absolute left-0 top-0 w-10 h-10 rounded-full bg-background border flex items-center justify-center font-mono text-xs transition-all duration-500 ${activeStep === 2 ? 'border-primary text-primary shadow-[0_0_15px_rgba(var(--color-primary),0.3)]' : activeStep > 2 ? 'border-primary bg-primary text-primary-content' : 'border-border text-muted-foreground'}`}>
+            <div
+              className={`relative z-10 pl-16 group transition-all duration-500 ${activeStep === 2 ? "opacity-100 scale-105" : "opacity-50"}`}
+            >
+              <div
+                className={`absolute left-0 top-0 w-10 h-10 rounded-full bg-background border flex items-center justify-center font-mono text-xs transition-all duration-500 ${activeStep === 2 ? "border-primary text-primary shadow-[0_0_15px_rgba(var(--color-primary),0.3)]" : activeStep > 2 ? "border-primary bg-primary text-primary-content" : "border-border text-muted-foreground"}`}
+              >
                 02
               </div>
-              <h3 className={`text-sm font-bold mb-1.5 transition-colors ${activeStep === 2 ? 'text-primary' : 'text-foreground'}`}>
+              <h3
+                className={`text-sm font-bold mb-1.5 transition-colors ${activeStep === 2 ? "text-primary" : "text-foreground"}`}
+              >
                 Tailor Materials
               </h3>
               <p className="text-muted-foreground text-[11px] leading-relaxed">
@@ -786,11 +793,17 @@ export default function Home() {
             </div>
 
             {/* Step 3 */}
-            <div className={`relative z-10 pl-16 group transition-all duration-500 ${activeStep === 3 ? 'opacity-100 scale-105' : 'opacity-50'}`}>
-              <div className={`absolute left-0 top-0 w-10 h-10 rounded-full bg-background border flex items-center justify-center font-mono text-xs transition-all duration-500 ${activeStep === 3 ? 'border-primary text-primary shadow-[0_0_15px_rgba(var(--color-primary),0.3)]' : activeStep > 3 ? 'border-primary bg-primary text-primary-content' : 'border-border text-muted-foreground'}`}>
+            <div
+              className={`relative z-10 pl-16 group transition-all duration-500 ${activeStep === 3 ? "opacity-100 scale-105" : "opacity-50"}`}
+            >
+              <div
+                className={`absolute left-0 top-0 w-10 h-10 rounded-full bg-background border flex items-center justify-center font-mono text-xs transition-all duration-500 ${activeStep === 3 ? "border-primary text-primary shadow-[0_0_15px_rgba(var(--color-primary),0.3)]" : activeStep > 3 ? "border-primary bg-primary text-primary-content" : "border-border text-muted-foreground"}`}
+              >
                 03
               </div>
-              <h3 className={`text-sm font-bold mb-1.5 transition-colors ${activeStep === 3 ? 'text-primary' : 'text-foreground'}`}>
+              <h3
+                className={`text-sm font-bold mb-1.5 transition-colors ${activeStep === 3 ? "text-primary" : "text-foreground"}`}
+              >
                 Simulate Boardrooms
               </h3>
               <p className="text-muted-foreground text-[11px] leading-relaxed">
@@ -801,11 +814,17 @@ export default function Home() {
             </div>
 
             {/* Step 4 */}
-            <div className={`relative z-10 pl-16 group transition-all duration-500 ${activeStep === 4 ? 'opacity-100 scale-105' : 'opacity-50'}`}>
-              <div className={`absolute left-0 top-0 w-10 h-10 rounded-full bg-background border flex items-center justify-center font-mono text-xs transition-all duration-500 ${activeStep === 4 ? 'border-primary text-primary shadow-[0_0_15px_rgba(var(--color-primary),0.3)]' : 'border-border text-muted-foreground'}`}>
+            <div
+              className={`relative z-10 pl-16 group transition-all duration-500 ${activeStep === 4 ? "opacity-100 scale-105" : "opacity-50"}`}
+            >
+              <div
+                className={`absolute left-0 top-0 w-10 h-10 rounded-full bg-background border flex items-center justify-center font-mono text-xs transition-all duration-500 ${activeStep === 4 ? "border-primary text-primary shadow-[0_0_15px_rgba(var(--color-primary),0.3)]" : "border-border text-muted-foreground"}`}
+              >
                 04
               </div>
-              <h3 className={`text-sm font-bold mb-1.5 transition-colors ${activeStep === 4 ? 'text-primary' : 'text-foreground'}`}>
+              <h3
+                className={`text-sm font-bold mb-1.5 transition-colors ${activeStep === 4 ? "text-primary" : "text-foreground"}`}
+              >
                 Maximize Compensation
               </h3>
               <p className="text-muted-foreground text-[11px] leading-relaxed">
