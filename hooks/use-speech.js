@@ -52,6 +52,7 @@ export default function useSpeech() {
         setSelectedVoiceName(savedVoice);
       } else if (englishVoices.length > 0) {
         const bestVoice = 
+          englishVoices.find(v => v.name.toLowerCase().includes("hazel")) ||
           englishVoices.find(v => v.name.includes("Google US English")) ||
           englishVoices.find(v => v.name.includes("Google UK English")) ||
           englishVoices.find(v => v.name.includes("Natural")) ||
@@ -295,6 +296,7 @@ export default function useSpeech() {
       
       const allVoices = window.speechSynthesis.getVoices();
       const preferredVoice = allVoices.find(v => v.name === selectedVoiceName) || 
+                             allVoices.find(v => v.name.toLowerCase().includes("hazel")) ||
                              allVoices.find(v => v.name.includes("Google US English")) ||
                              allVoices.find(v => v.name.includes("Google UK English")) ||
                              allVoices.find(v => v.name.includes("Natural")) ||
