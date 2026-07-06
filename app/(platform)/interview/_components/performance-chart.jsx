@@ -24,10 +24,13 @@ export const PerformanceChart = ({ assessments }) => {
 
     useEffect(() => {
         if (assessments?.length) {
-            const formattedData = assessments.map((assessment) => ({
-                date: format(new Date(assessment.createdAt), "MMM dd"),
-                score: assessment.quizScore,
-            }));
+            const formattedData = [...assessments]
+                .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+                .map((assessment) => ({
+                    date: format(new Date(assessment.createdAt), "MMM dd"),
+                    fullDate: format(new Date(assessment.createdAt), "MMM dd, yyyy h:mm a"),
+                    score: assessment.quizScore,
+                }));
             setChartData(formattedData);
         }
     }, [assessments]);
@@ -46,11 +49,12 @@ export const PerformanceChart = ({ assessments }) => {
                         <LineChart data={chartData}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
                             <XAxis
-                                dataKey="date"
+                                dataKey="fullDate"
                                 stroke="#888888"
                                 fontSize={12}
                                 tickLine={false}
                                 axisLine={false}
+                                tickFormatter={(value) => value ? value.split(",")[0] : ""}
                             />
                             <YAxis
                                 stroke="#888888"
@@ -69,7 +73,7 @@ export const PerformanceChart = ({ assessments }) => {
                                                     Score: {payload[0].value}%
                                                 </p>
                                                 <p className="text-xs text-muted-foreground">
-                                                    {payload[0].payload.date}
+                                                    {payload[0].payload.fullDate}
                                                 </p>
                                             </div>
                                         );

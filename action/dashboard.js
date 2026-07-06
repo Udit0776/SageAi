@@ -51,13 +51,35 @@ export async function getIndustryInsights() {
   const hasNoInsights = !user.industryInsight;
   const isOutdated = user.industryInsight && user.industryInsight.nextUpdate < new Date();
 
-  // If no insights or insights are outdated, trigger background updates asynchronously
+  // If no insights or insights are outdated, trigger background updates
   if (hasNoInsights || isOutdated) {
     console.log(`[Dashboard] Industry insights for "${user.industry}" are outdated/missing. Dispatching background Inngest event.`);
-    inngest.send({
-      name: "app/industry-insights.generate",
-      data: { industry: user.industry },
-    }).catch(err => console.error("Failed to send Inngest event for industry insights:", err));
+    try {
+      await inngest.send({
+        name: "app/industry-insights.generate",
+        data: { industry: user.industry },
+      });
+    } catch (err) {
+      console.error("Failed to send Inngest event for industry insights (likely offline). Generating synchronously inline:", err);
+      try {
+        const insights = await generateAIInsights(user.industry);
+        const industryInsight = await db.industryInsight.upsert({
+          where: { industry: user.industry },
+          create: {
+            industry: user.industry,
+            ...insights,
+            nextUpdate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+          },
+          update: {
+            ...insights,
+            nextUpdate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+          },
+        });
+        return industryInsight;
+      } catch (inlineErr) {
+        console.error("Inline insight generation failed:", inlineErr);
+      }
+    }
   }
 
   // If we don't have insights at all in the DB, return a temporary static fallback immediately

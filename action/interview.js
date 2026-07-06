@@ -24,31 +24,31 @@ export async function generateQuiz() {
 
   const weaknessProfile = computeWeaknessProfile(assessments);
 
-  // Extract last 10 questions to avoid repeating
-  const last10Questions = [];
+  // Extract last 30 questions to avoid repeating
+  const recentQuestions = [];
   for (const assessment of assessments) {
     if (assessment.questions) {
       for (const q of assessment.questions) {
-        if (last10Questions.length < 10) {
-          last10Questions.push(q.question);
+        if (recentQuestions.length < 30) {
+          recentQuestions.push(q.question);
         } else {
           break;
         }
       }
     }
-    if (last10Questions.length >= 10) break;
+    if (recentQuestions.length >= 30) break;
   }
 
   const adaptiveContext = buildAdaptivePromptContext(
     weaknessProfile,
     user.skills,
     user.industry,
-    last10Questions,
+    recentQuestions,
     assessments.length
   );
 
   const prompt = `
-    Generate 10 technical interview questions for a ${
+    Generate 10 random, highly varied, and creative technical interview questions for a ${
       user.industry
     } professional${
       user.skills?.length ? ` with expertise in ${user.skills.join(", ")}` : ""
@@ -56,6 +56,7 @@ export async function generateQuiz() {
     
     ${adaptiveContext ? `Adaptive parameters:\n${adaptiveContext}\n` : ""}
     
+    CRITICAL: Do not use standard or repetitive textbook examples. Ensure high variation in the generated questions.
     Each question should be multiple choice with 4 options.
     For each question, also detect its topic/category from the list: ["javascript", "react", "system design", "algorithms", "databases", "css", "typescript", "nodejs", "python", "devops", "testing"]. Use "other" if none match.
     Also specify the difficulty: "easy", "medium", or "hard".

@@ -86,7 +86,9 @@ export default function DashboardView({ insights, interviewSessions, jobApplicat
     : "N/A";
     
   const nextUpdateDistance = insights.nextUpdate && !isNaN(new Date(insights.nextUpdate))
-    ? formatDistanceToNow(new Date(insights.nextUpdate), { addSuffix: true })
+    ? (new Date(insights.nextUpdate) < new Date() 
+        ? "Pending..." 
+        : formatDistanceToNow(new Date(insights.nextUpdate), { addSuffix: true }))
     : "soon";
 
   return (
