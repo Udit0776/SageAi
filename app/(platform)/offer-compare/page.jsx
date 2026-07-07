@@ -69,18 +69,7 @@ export default function OfferComparePage() {
               />
             ) : (
               <Card className="bg-card/50 backdrop-blur-sm border-primary/10 shadow-lg">
-                <CardHeader className="pb-4 border-b border-white/5 flex flex-row items-center gap-3">
-                  <div className="h-9 w-9 rounded-xl bg-indigo-500/10 flex items-center justify-center border border-indigo-500/10 shrink-0">
-                    <Layers className="h-4.5 w-4.5 text-indigo-400" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-base font-bold">New Offer Assessment</CardTitle>
-                    <CardDescription className="text-[10px]">Add details of 2 or 3 active job offers to compare</CardDescription>
-                  </div>
-                </CardHeader>
-                <CardContent className="p-6">
-                  <ComparisonForm onComparisonGenerated={handleComparisonGenerated} />
-                </CardContent>
+                <ComparisonForm onComparisonGenerated={handleComparisonGenerated} />
               </Card>
             )}
           </div>

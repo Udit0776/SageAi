@@ -89,11 +89,11 @@ export default function AIAssistantBubble() {
                 <div className={`h-7 w-7 sm:h-8 sm:w-8 rounded-full flex items-center justify-center shrink-0 border ${
                   msg.role === "user" ? "bg-primary border-primary/20" : "bg-base-200 border-border"
                 }`}>
-                  {msg.role === "user" ? <User className="h-3 w-3 sm:h-4 sm:w-4 text-primary-content" /> : <Bot className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />}
+                  {msg.role === "user" ? <User className="h-3 w-3 sm:h-4 sm:w-4 text-primary-foreground" /> : <Bot className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />}
                 </div>
                 <div className={`max-w-[85%] p-2.5 sm:p-3 rounded-2xl text-[10px] sm:text-xs leading-relaxed shadow-sm ${
                   msg.role === "user" 
-                    ? "bg-primary text-primary-content rounded-tr-none" 
+                    ? "bg-primary text-primary-foreground rounded-tr-none" 
                     : "bg-base-200 text-base-content rounded-tl-none border border-border"
                 }`}>
                   {msg.content}
@@ -126,7 +126,7 @@ export default function AIAssistantBubble() {
                  size="icon" 
                  onClick={handleSend} 
                  disabled={isTyping || !input.trim()}
-                 className="h-9 w-9 sm:h-10 sm:w-10 shrink-0 cursor-pointer shadow-md bg-primary hover:brightness-110 text-primary-content border-0 shadow-primary/20"
+                 className="h-9 w-9 sm:h-10 sm:w-10 shrink-0 cursor-pointer shadow-md bg-primary hover:brightness-110 text-primary-foreground border-0 shadow-primary/20"
                >
                  <Send className="h-3 w-3 sm:h-4 sm:w-4" />
                </Button>
@@ -138,7 +138,7 @@ export default function AIAssistantBubble() {
       <Button
         onClick={() => setIsOpen(!isOpen)}
         size="icon"
-        className={`h-11 w-11 sm:h-14 sm:w-14 rounded-full shadow-lg shadow-primary/30 transition-all duration-300 pointer-events-auto cursor-pointer bg-primary hover:brightness-110 hover:scale-105 border border-primary/20 text-primary-content ${
+        className={`h-11 w-11 sm:h-14 sm:w-14 rounded-full shadow-lg shadow-primary/30 transition-all duration-300 pointer-events-auto cursor-pointer bg-primary hover:brightness-110 hover:scale-105 border border-primary/20 text-primary-foreground ${
           isOpen ? "hidden" : "scale-100 opacity-100"
         }`}
       >

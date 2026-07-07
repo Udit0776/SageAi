@@ -8,7 +8,7 @@ import { Label } from '@/app/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/app/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select';
 import { compareOffers } from '@/action/offer-compare';
-import { Plus, Trash2, Sparkles, Loader2, ArrowRight } from 'lucide-react';
+import { Plus, Trash2, Sparkles, Loader2, ArrowRight, Layers } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function ComparisonForm({ onComparisonGenerated }) {
@@ -124,8 +124,27 @@ export default function ComparisonForm({ onComparisonGenerated }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
+    <form onSubmit={handleSubmit} className="flex flex-col">
+      <CardHeader className="pb-4 border-b border-white/5 flex flex-row items-center justify-between gap-3 px-6 pt-6">
+        <div className="flex flex-row items-center gap-3">
+          <div className="h-9 w-9 rounded-xl bg-indigo-500/10 flex items-center justify-center border border-indigo-500/10 shrink-0">
+            <Layers className="h-4.5 w-4.5 text-indigo-400" />
+          </div>
+          <div className="space-y-1">
+            <CardTitle className="text-base font-bold">New Offer Assessment</CardTitle>
+            <CardDescription className="text-[10px]">Add details of 2 or 3 active job offers to compare</CardDescription>
+          </div>
+        </div>
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs h-9 px-4 rounded-xl shadow-lg shadow-indigo-600/20 cursor-pointer flex items-center gap-1.5"
+        >
+          Compare Offers <ArrowRight className="h-3.5 w-3.5" />
+        </Button>
+      </CardHeader>
+      <CardContent className="p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
         {offers.map((offer, index) => (
           <Card key={index} className="bg-card/50 backdrop-blur-sm border-primary/10 hover:border-primary/20 transition-all duration-300 relative flex flex-col justify-between">
             <CardHeader className="pb-3 flex flex-row justify-between items-start">
@@ -183,6 +202,12 @@ export default function ComparisonForm({ onComparisonGenerated }) {
                     min="0"
                     value={offer.baseSalary}
                     onChange={(e) => handleFieldChange(index, 'baseSalary', e.target.value)}
+                    onWheel={(e) => e.target.blur()}
+                    onKeyDown={(e) => {
+                      if (e.key === '-' || e.key === 'e' || e.key === 'E' || e.key === '+') {
+                        e.preventDefault();
+                      }
+                    }}
                     className="h-8.5 text-xs bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary"
                   />
                 </div>
@@ -194,6 +219,12 @@ export default function ComparisonForm({ onComparisonGenerated }) {
                     min="0"
                     value={offer.equityBonus}
                     onChange={(e) => handleFieldChange(index, 'equityBonus', e.target.value)}
+                    onWheel={(e) => e.target.blur()}
+                    onKeyDown={(e) => {
+                      if (e.key === '-' || e.key === 'e' || e.key === 'E' || e.key === '+') {
+                        e.preventDefault();
+                      }
+                    }}
                     className="h-8.5 text-xs bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary"
                   />
                 </div>
@@ -260,26 +291,17 @@ export default function ComparisonForm({ onComparisonGenerated }) {
           <Card 
             type="button"
             onClick={addOfferSlot}
-            className="border border-dashed border-primary/20 bg-primary/2 flex flex-col items-center justify-center p-6 text-center cursor-pointer hover:bg-primary/5 hover:border-primary/45 transition-all duration-300 min-h-[300px]"
+            className="md:col-span-2 border border-dashed border-primary/20 bg-primary/5 flex flex-col items-center justify-center p-6 text-center cursor-pointer hover:bg-primary/10 hover:border-primary/45 transition-all duration-300 min-h-[120px]"
           >
-            <Plus className="h-8 w-8 text-primary/60 mb-2" />
+            <Plus className="h-6 w-6 text-primary/80 mb-2" />
             <h4 className="text-xs font-bold text-white uppercase tracking-wider">Add Third Offer</h4>
-            <p className="text-[10px] text-muted-foreground max-w-[150px] mt-1 leading-normal">
+            <p className="text-[10px] text-muted-foreground mt-1">
               Compare 3 jobs concurrently to maximize analysis resolution.
             </p>
           </Card>
         )}
       </div>
-
-      <div className="flex justify-end gap-3 pt-2">
-        <Button
-          type="submit"
-          disabled={isSubmitting}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs h-10 px-6 rounded-xl shadow-lg shadow-indigo-600/20 cursor-pointer flex items-center gap-1.5"
-        >
-          Compare Offers <ArrowRight className="h-4 w-4" />
-        </Button>
-      </div>
+      </CardContent>
     </form>
   );
 }
