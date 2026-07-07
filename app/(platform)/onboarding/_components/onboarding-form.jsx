@@ -460,7 +460,8 @@ export default function OnboardingForm({ industries }) {
                                                 <button
                                                     key={idx}
                                                     type="button"
-                                                    onClick={() => {
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
                                                         setValue("bio", template.text, { shouldValidate: true });
                                                     }}
                                                     className="inline-flex items-center text-[10px] font-semibold px-2 py-1 rounded bg-zinc-900 border border-white/5 hover:border-indigo-500/30 text-zinc-400 hover:text-white transition-all cursor-pointer"

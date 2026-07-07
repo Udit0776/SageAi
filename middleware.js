@@ -22,7 +22,7 @@ export default clerkMiddleware(async (auth, req) => {
 
   // If user is signed in and visits the root landing page, redirect to dashboard
   if (userId && url.pathname === "/") {
-    return NextResponse.redirect(new URL("/dashboard", req.url));
+    return NextResponse.redirect(new URL("/onboarding", req.url));
   }
 
   if (isPublicRoute(req)) {

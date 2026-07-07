@@ -37,8 +37,8 @@ export default async function Header() {
 
                     <SignedOut userId={userId}>
                         <div className="flex items-center gap-4">
-                            <SignInButton mode="modal"><span><button className="hidden md:block text-base-content/60 hover:text-base-content font-semibold px-4 py-2 text-xs uppercase tracking-wider transition-all cursor-pointer active:scale-95 bg-transparent border-0">Sign In</button></span></SignInButton>
-                            <SignUpButton mode="modal"><span><button className="bg-primary text-primary-content font-bold px-6 py-2 rounded-full text-xs uppercase tracking-wider hover:brightness-110 hover:shadow-lg hover:shadow-primary/30 transition-all cursor-pointer active:scale-95 border-0">Get Started</button></span></SignUpButton>
+                            <SignInButton mode="modal"><button type="button" className="hidden md:block text-base-content/60 hover:text-base-content font-semibold px-4 py-2 text-xs uppercase tracking-wider transition-all cursor-pointer active:scale-95 bg-transparent border-0">Sign In</button></SignInButton>
+                            <SignUpButton mode="modal"><button type="button" className="bg-primary text-primary-content font-bold px-6 py-2 rounded-full text-xs uppercase tracking-wider hover:brightness-110 hover:shadow-lg hover:shadow-primary/30 transition-all cursor-pointer active:scale-95 border-0">Get Started</button></SignUpButton>
                         </div>
                     </SignedOut>
 

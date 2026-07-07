@@ -10,7 +10,10 @@ const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const generateAIInsights = async (industry) => {
   const prompt = `
-          Analyze the current state of the ${industry} industry and provide insights in ONLY the following JSON format without any additional notes or explanations:
+          Analyze the current state of the ${industry} industry and provide highly realistic, data-driven insights. 
+          Be critical and specific. Growth rates typically range from 2% to 15% depending on the exact sub-sector (do not default to inflated numbers like 25%).
+          Demand levels and market outlooks should realistically reflect current macroeconomic conditions—if a sector is saturated, consolidating, or facing headwinds, reflect that with MEDIUM/LOW demand or NEUTRAL/NEGATIVE outlook.
+          Provide insights in ONLY the following JSON format without any additional notes or explanations:
           {
             "salaryRanges": [
               { "role": "string", "min": number, "max": number, "median": number, "location": "string" }
@@ -25,8 +28,8 @@ export const generateAIInsights = async (industry) => {
           
           IMPORTANT: Return ONLY the JSON. No additional text, notes, or markdown formatting.
           Include at least 5 common roles for salary ranges.
-          Growth rate should be a percentage.
-          Include at least 5 skills and trends.
+          Growth rate should be a realistic percentage.
+          Include at least 5 highly specific skills and trends for this exact industry.
         `;
 
   const text = await getAIResponse(prompt);
