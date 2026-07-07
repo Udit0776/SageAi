@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import InterviewSetup from "./_components/interview-setup";
 
 export default async function InterviewCoachPage() {
+  console.log(">> HITTING INTERVIEW COACH PAGE SERVER ROUTE");
   const { userId } = await auth();
   if (!userId) redirect("/sign-in");
 
