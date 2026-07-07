@@ -47,6 +47,7 @@ export default function PlatformLayout({ children }) {
   }
 
   const isOnboarding = pathname === "/onboarding";
+  const isSessionPage = pathname.includes("/interview/coach/session");
 
   // If onboarding, show a clean centered layout without the sidebar/header shell
   if (isOnboarding) {
@@ -150,9 +151,10 @@ export default function PlatformLayout({ children }) {
     <div className="min-h-screen bg-background text-foreground flex overflow-x-hidden">
       
       {/* 1. Desktop Sidebar */}
-      <aside className={`hidden md:flex flex-col fixed top-0 left-0 h-screen bg-sidebar/80 backdrop-blur-xl border-r border-sidebar-border z-40 transition-all duration-300 overflow-x-hidden select-none ${
-        isCollapsed ? "w-12" : "w-48"
-      }`}>
+      {!isSessionPage && (
+        <aside className={`hidden md:flex flex-col fixed top-0 left-0 h-screen bg-sidebar/80 backdrop-blur-xl border-r border-sidebar-border z-40 transition-all duration-300 overflow-x-hidden select-none ${
+          isCollapsed ? "w-12" : "w-48"
+        }`}>
         {/* Brand Header */}
         <div className={`h-10 flex items-center border-b border-sidebar-border overflow-x-hidden ${
           isCollapsed ? "justify-center px-0" : "justify-between px-3"
@@ -214,6 +216,8 @@ export default function PlatformLayout({ children }) {
           })}
         </nav>
       </aside>
+      )}
+
 
       {/* 2. Mobile Sidebar Drawer Overlay */}
       {isMobileOpen && (
@@ -264,10 +268,11 @@ export default function PlatformLayout({ children }) {
 
       {/* 4. Main Page Right Outlet Area */}
       <div className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ${
-        isCollapsed ? "md:pl-12" : "md:pl-48"
+        isSessionPage ? "pl-0" : (isCollapsed ? "md:pl-12" : "md:pl-48")
       }`}>
         
         {/* Top Header Bar */}
+        {!isSessionPage && (
         <header className="h-10 border-b border-sidebar-border bg-background/70 backdrop-blur-md sticky top-0 z-30 px-3 flex items-center justify-between relative select-none">
           {/* Left: Mobile hamburger */}
           <div className="flex items-center">
@@ -307,6 +312,7 @@ export default function PlatformLayout({ children }) {
             )}
           </div>
         </header>
+        )}
 
         {/* Content Pane Outlet wrapped in platform-container */}
         <main className="flex-1 w-full relative platform-container">
